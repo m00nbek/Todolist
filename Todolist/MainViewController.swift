@@ -24,7 +24,11 @@ class MainViewController: UIViewController {
     }
     // MARK: - Properties
     private var isLoggedIn = true
-    private var todos = [Todo]()
+    var todos = [Todo]() {
+        didSet {
+            tableView.reloadData()
+        }
+    }
     
     private let paperFolderImageView: UIImageView = {
         let imageView = UIImageView()
@@ -52,19 +56,42 @@ class MainViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle("+ Add new task", for: .normal)
         button.titleLabel?.textColor = .systemGreen
+        button.addTarget(self, action: #selector(addNewTask), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     // MARK: - Selectors
+    @objc private func addNewTask() {
+        let alert = UIAlertController(title: "New Task", message: "Add new task", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        
+        var alertTextField: UITextField = {
+            let tf = UITextField()
+            tf.placeholder = "Add New Task"
+            tf.translatesAutoresizingMaskIntoConstraints = false
+            return tf
+        }()
+        
+        alert.addTextField { textField in
+            textField.translatesAutoresizingMaskIntoConstraints = false
+            alertTextField = textField
+        }
+        let action = UIAlertAction(title: "Add", style: .default) { [weak self] _ in
+            // append new item to the array & reloadData()
+            guard let text = alertTextField.text else {return}
+            let newTodo = Todo(title: text, isCompleted: false)
+            self?.todos.append(newTodo)
+            self?.tableView.reloadData()
+        }
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
+    }
     // MARK: - API
     // MARK: - Functions
     private func configureUI() {
-        todos.append(Todo(title: "New task1", isCompleted: false))
-        todos.append(Todo(title: "New task2", isCompleted: false))
-        todos.append(Todo(title: "New task3", isCompleted: false))
         
         view.backgroundColor = .white
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        tableView.register(TodoCell.self, forCellReuseIdentifier: "cell")
         
         paperFolderImageView.heightAnchor.constraint(equalToConstant: view.frame.height/3).isActive = true
         
@@ -83,7 +110,12 @@ class MainViewController: UIViewController {
         tableView.topAnchor.constraint(equalTo: todoTitle.bottomAnchor, constant: 10).isActive = true
         tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10).isActive = true
         tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10).isActive = true
-        tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+        
+        view.addSubview(newTaskButton)
+        newTaskButton.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 10).isActive = true
+        newTaskButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10).isActive = true
+        newTaskButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10).isActive = true
+        newTaskButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
     }
 }
 
@@ -93,24 +125,29 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
         return todos.count
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        cell.textLabel?.text = todos[indexPath.row].title
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as? TodoCell else {
+            fatalError("Could not create cell")
+        }
+        cell.todoIndex = indexPath.row
+        cell.todoText = todos[indexPath.row].title
+        cell.delegate = self
+        cell.isCompleted = todos[indexPath.row].isCompleted
+        
         return cell
+    }
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 60
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         todos[indexPath.row].isCompleted.toggle()
-        
-        guard let cell = tableView.cellForRow(at: indexPath) else {return}
-        let attributeString = NSMutableAttributedString(string: todos[indexPath.row].title)
-        attributeString.addAttribute(.strikethroughStyle, value: 2, range: NSMakeRange(0, attributeString.length))
-        if todos[indexPath.row].isCompleted {
-            cell.textLabel?.text = nil
-            cell.textLabel?.attributedText = attributeString
-        } else {
-            cell.textLabel?.attributedText = nil
-            cell.textLabel?.text = todos[indexPath.row].title
-        }
     }
     
+}
+// MARK: - TodoCellDelegate
+extension MainViewController: TodoCellDelegate {
+    func deleteItemAt(_ index: Int) {
+        todos.remove(at: index)
+        tableView.reloadData()
+    }
 }

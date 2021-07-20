@@ -19,17 +19,16 @@ class MainViewController: UIViewController {
         if !isLoggedIn {
             let nav = UINavigationController(rootViewController: LoginViewController())
             nav.modalPresentationStyle = .fullScreen
-            navigationController?.pushViewController(nav, animated: true)
+            present(nav, animated: true)
         }
     }
     // MARK: - Properties
-    private var isLoggedIn = true
+    private var isLoggedIn = false
     var todos = [Todo]() {
         didSet {
             tableView.reloadData()
         }
     }
-    
     private let paperFolderImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "paper_folder")

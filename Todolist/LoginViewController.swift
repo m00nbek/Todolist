@@ -41,14 +41,11 @@ class LoginViewController: UIViewController {
         guard let image = UIImage(named: "ic_mail_outline_white_2x-1") else {fatalError()}
         let view = Utilities().inputContainerView(withImage: image, textField: emailTextField)
         view.layer.borderColor = UIColor.red.cgColor
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     private lazy var passwordContainerView: UIView = {
         guard let image = UIImage(named: "ic_lock_outline_white_2x") else {fatalError()}
         let view = Utilities().inputContainerView(withImage: image, textField: passwordTextField)
-        view.layer.borderColor = UIColor.red.cgColor
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     private let emailTextField: UITextField = {
@@ -59,6 +56,15 @@ class LoginViewController: UIViewController {
         let tf = Utilities().textField(withPlaceholder: "Password")
         tf.isSecureTextEntry = true
         return tf
+    }()
+    private lazy var loginStack: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [emailContainerView,
+                                                   passwordContainerView])
+        stack.axis = .vertical
+        stack.spacing = 8
+        stack.distribution = .fillEqually
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        return stack
     }()
     // MARK: - Selectors
     @objc private func signUp() {
@@ -83,27 +89,10 @@ class LoginViewController: UIViewController {
         signInTitle.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
         signInTitle.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
         
-        view.addSubview(emailContainerView)
-        emailContainerView.topAnchor.constraint(equalTo: signInTitle.bottomAnchor, constant: 10).isActive = true
-        emailContainerView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 32).isActive = true
-        emailContainerView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -32).isActive = true
-        
-        view.addSubview(passwordContainerView)
-        passwordContainerView.topAnchor.constraint(equalTo: emailContainerView.bottomAnchor, constant: 10).isActive = true
-        passwordContainerView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 32).isActive = true
-        passwordContainerView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -32).isActive = true
-        
-//        let stack = UIStackView(arrangedSubviews: [emailContainerView,
-//                                                   passwordContainerView])
-//        stack.axis = .vertical
-//        stack.spacing = 8
-//        stack.distribution = .fillEqually
-//        stack.translatesAutoresizingMaskIntoConstraints = false
-//
-//        view.addSubview(stack)
-//        stack.topAnchor.constraint(equalTo: signInTitle.bottomAnchor, constant: 10).isActive = true
-//        stack.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 32).isActive = true
-//        stack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -32).isActive = true
+        view.addSubview(loginStack)
+        loginStack.topAnchor.constraint(equalTo: signInTitle.bottomAnchor, constant: 10).isActive = true
+        loginStack.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 32).isActive = true
+        loginStack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -32).isActive = true
         
         
         view.addSubview(signUpButton)

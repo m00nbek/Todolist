@@ -9,49 +9,49 @@ import UIKit
 
 class Utilities {
     func inputContainerView(withImage image: UIImage, textField: UITextField) -> UIView {
-        let view = UIView()
-        view.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        view.translatesAutoresizingMaskIntoConstraints = false
-
-        let iv = UIImageView()
-        iv.image = image
-        iv.contentMode = .scaleAspectFit
-        let dividerView = UIView()
-        dividerView.backgroundColor = .white
-        
-        dividerView.translatesAutoresizingMaskIntoConstraints = false
-//        iv.translatesAutoresizingMaskIntoConstraints = false
-        
+        // Properties
+        let view: UIView = {
+            let view = UIView()
+            view.layer.borderColor = UIColor.red.cgColor
+            view.heightAnchor.constraint(equalToConstant: 50).isActive = true
+            view.translatesAutoresizingMaskIntoConstraints = false
+            return view
+        }()
+        let imageView: UIImageView = {
+            let iv = UIImageView()
+            iv.contentMode = .scaleAspectFit
+            iv.widthAnchor.constraint(equalToConstant: 24).isActive = true
+            iv.image = image
+            return iv
+        }()
+        let dividerView: UIView = {
+            let view = UIView()
+            view.backgroundColor = .white
+            view.translatesAutoresizingMaskIntoConstraints = false
+            view.heightAnchor.constraint(equalToConstant: 0.75).isActive = true
+            return view
+        }()
+        let stackView: UIStackView = {
+            let stack = UIStackView(arrangedSubviews: [imageView, textField])
+            stack.axis = .horizontal
+            stack.spacing = 8
+            stack.distribution = .fillProportionally
+            stack.translatesAutoresizingMaskIntoConstraints = false
+            return stack
+        }()
+        // Adding properties to the view
         view.addSubview(dividerView)
-//        view.addSubview(iv)
-//        view.addSubview(textField)
-        
-//        iv.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 8).isActive = true
-//        iv.bottomAnchor.constraint(equalTo: dividerView.topAnchor, constant: 8).isActive = true
-        iv.widthAnchor.constraint(equalToConstant: 24).isActive = true
-//        iv.heightAnchor.constraint(equalToConstant: 24).isActive = true
-//
-//        textField.leftAnchor.constraint(equalTo: iv.rightAnchor, constant: 8).isActive = true
-//        textField.bottomAnchor.constraint(equalTo: dividerView.topAnchor, constant: 8).isActive = true
-//        textField.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
-
-        let stack = UIStackView(arrangedSubviews: [iv, textField])
-        stack.axis = .horizontal
-        stack.spacing = 8
-        stack.distribution = .fillProportionally
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        
-        view.addSubview(stack)
-        stack.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        stack.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 8).isActive = true
-        stack.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
-        stack.bottomAnchor.constraint(equalTo: dividerView.topAnchor).isActive = true
-        
+        view.addSubview(stackView)
+        // Constraints
+        stackView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        stackView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 8).isActive = true
+        stackView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
+        stackView.bottomAnchor.constraint(equalTo: dividerView.topAnchor).isActive = true
         
         dividerView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 8).isActive = true
         dividerView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         dividerView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
-        dividerView.heightAnchor.constraint(equalToConstant: 0.75).isActive = true
+        
         return view
     }
     func textField(withPlaceholder placeholder: String) -> UITextField {

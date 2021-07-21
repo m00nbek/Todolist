@@ -22,11 +22,12 @@ class Utilities {
             iv.contentMode = .scaleAspectFit
             iv.widthAnchor.constraint(equalToConstant: 24).isActive = true
             iv.image = image
+            iv.tintColor = UIColor(named: "textFieldColor")
             return iv
         }()
         let dividerView: UIView = {
             let view = UIView()
-            view.backgroundColor = .white
+            view.backgroundColor = UIColor(named: "loginColor")
             view.translatesAutoresizingMaskIntoConstraints = false
             view.heightAnchor.constraint(equalToConstant: 0.75).isActive = true
             return view
@@ -51,15 +52,16 @@ class Utilities {
         dividerView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 8).isActive = true
         dividerView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         dividerView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
-        
+    
         return view
     }
     func textField(withPlaceholder placeholder: String) -> UITextField {
         let tf = UITextField()
         tf.translatesAutoresizingMaskIntoConstraints = false
-        tf.textColor = .white
+        tf.textColor = UIColor(named: "textFieldColor")
         tf.font = UIFont.systemFont(ofSize: 16)
-        tf.attributedPlaceholder = NSAttributedString(string: placeholder, attributes: [NSAttributedString.Key.foregroundColor: UIColor.white])
+        tf.attributedPlaceholder = NSAttributedString(string: placeholder,
+                                                      attributes: [NSAttributedString.Key.foregroundColor: UIColor(named: "textFieldColor")!])
         return tf
     }
 }

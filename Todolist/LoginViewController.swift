@@ -38,13 +38,13 @@ class LoginViewController: UIViewController {
         return button
     }()
     private lazy var emailContainerView: UIView = {
-        guard let image = UIImage(named: "ic_mail_outline_white_2x-1") else {fatalError()}
+        guard let image = UIImage(systemName: "envelope") else {fatalError()}
         let view = Utilities().inputContainerView(withImage: image, textField: emailTextField)
         view.layer.borderColor = UIColor.red.cgColor
         return view
     }()
     private lazy var passwordContainerView: UIView = {
-        guard let image = UIImage(named: "ic_lock_outline_white_2x") else {fatalError()}
+        guard let image = UIImage(systemName: "lock") else {fatalError()}
         let view = Utilities().inputContainerView(withImage: image, textField: passwordTextField)
         return view
     }()
@@ -101,5 +101,9 @@ class LoginViewController: UIViewController {
         signUpButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10).isActive = true
         signUpButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         
+        
+        // make color sets for login items
+        // compare design & do small changes
+        // switch to the register controller (look at tg)
     }
 }

@@ -45,11 +45,11 @@ class Utilities {
         view.addSubview(stackView)
         // Constraints
         stackView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        stackView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 8).isActive = true
+        stackView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
         stackView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
         stackView.bottomAnchor.constraint(equalTo: dividerView.topAnchor).isActive = true
         
-        dividerView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 8).isActive = true
+        dividerView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
         dividerView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         dividerView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
     

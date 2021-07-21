@@ -14,6 +14,7 @@ class LoginViewController: UIViewController {
         configureUI()
     }
     // MARK: - Properties
+    private var lockHeightAnchor: NSLayoutConstraint?
     private let lockImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "lock")
@@ -91,15 +92,23 @@ class LoginViewController: UIViewController {
     }()
     // MARK: - Selectors
     @objc private func signUp() {
-        let nav = UINavigationController(rootViewController: MainViewController())
+        let nav = UINavigationController(rootViewController: RegisterViewController())
         nav.modalPresentationStyle = .fullScreen
         present(nav, animated: true)
     }
     // MARK: - API
     // MARK: - Functions
     private func configureUI() {
+        // textField delegates
+        emailTextField.delegate = self
+        passwordTextField.delegate = self
+        
         view.backgroundColor = UIColor(named: "mainBackground")
-        lockImageView.heightAnchor.constraint(equalToConstant: view.frame.height/2).isActive = true
+//        lockImageView.heightAnchor.constraint(equalToConstant: view.frame.height/2).isActive = true
+        
+        lockHeightAnchor = lockImageView.heightAnchor.constraint(equalToConstant: view.frame.height/2)
+        // the multiplier 0.3 means we are setting height of topViewForImage to the 30% of view's height.
+        lockHeightAnchor?.isActive = true
         
         view.addSubview(lockImageView)
         lockImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10).isActive = true
@@ -124,14 +133,59 @@ class LoginViewController: UIViewController {
         loginButtonStack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -32).isActive = true
         
         view.addSubview(signUpButton)
-//        signUpButton.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 10).isActive = true
+        //        signUpButton.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 10).isActive = true
         signUpButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10).isActive = true
         signUpButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10).isActive = true
         signUpButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         
+    }
+}
+// MARK: - UITextFieldDelegate
+extension LoginViewController: UITextFieldDelegate {
+    func textFieldDidBeginEditing(_ textField: UITextField) {
         
-        // make color sets for login items
-        // compare design & do small changes
-        // switch to the register controller (look at tg)
+
+//        for constraint in self.lockImageView.constraints {
+//            if constraint.firstAnchor == self.lockImageView.heightAnchor {
+//                UIView.animate(withDuration: 0.3) {
+//                    constraint.constant = self.view.frame.height/3
+//                    self.lockImageView.layoutIfNeeded()
+//                }
+//            }
+//        }
+//        self.lockImageView.heightAnchor.constraint(equalToConstant: self.view.frame.height/3).isActive = true
+        
+        
+        lockHeightAnchor?.isActive = false
+        lockHeightAnchor = self.lockImageView.heightAnchor.constraint(equalToConstant: self.view.frame.height/3)
+        lockHeightAnchor?.isActive = true
+        UIView.animate(withDuration: 0.5) {
+           self.view.layoutIfNeeded()
+        }
+//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3,
+//                                                       delay: 0,
+//                                                       options: []) {
+//
+//            // move
+//            let transpose = CGAffineTransform(translationX: 0, y: 0)
+//            let scale = CGAffineTransform(scaleX: 0.7, y: 0.7)
+//            self.lockImageView.transform = transpose.concatenating(scale)
+//            self.lockImageView.setNeedsDisplay()
+//        } completion: { _ in
+//        }
+    }
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if textField == emailTextField {
+            passwordTextField.becomeFirstResponder()
+        } else {
+            textField.resignFirstResponder()
+            lockHeightAnchor?.isActive = false
+            lockHeightAnchor = self.lockImageView.heightAnchor.constraint(equalToConstant: self.view.frame.height/2)
+            lockHeightAnchor?.isActive = true
+            UIView.animate(withDuration: 0.5) {
+               self.view.layoutIfNeeded()
+            }
+        }
+        return true
     }
 }

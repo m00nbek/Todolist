@@ -14,6 +14,7 @@ class RegisterViewController: UIViewController {
         configureUI()
     }
     // MARK: - Properties
+    private var keyHeightAnchor: NSLayoutConstraint?
     private let keyImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "key")
@@ -49,12 +50,13 @@ class RegisterViewController: UIViewController {
         return view
     }()
     private lazy var fullnameContainerView: UIView = {
-        guard let image = UIImage(systemName: "lock") else {fatalError()}
+        guard let image = UIImage(systemName: "person") else {fatalError()}
         let view = Utilities().inputContainerView(withImage: image, textField: fullnameTextField)
         return view
     }()
     private let fullnameTextField: UITextField = {
-        let tf = Utilities().textField(withPlaceholder: "Full Name")
+        let tf = Utilities().textField(withPlaceholder: "Full name")
+        tf.textContentType = .password
         return tf
     }()
     private let emailTextField: UITextField = {
@@ -94,10 +96,18 @@ class RegisterViewController: UIViewController {
     // MARK: - API
     // MARK: - Functions
     private func configureUI() {
+        // textField delegates
+        fullnameTextField.delegate = self
+        emailTextField.delegate = self
+        passwordTextField.delegate = self
+        
         view.backgroundColor = UIColor(named: "mainBackground")
-        keyImageView.heightAnchor.constraint(equalToConstant: view.frame.height/3).isActive = true
         
         view.addSubview(keyImageView)
+        
+        keyHeightAnchor = keyImageView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.45)
+        keyHeightAnchor?.isActive = true
+        
         keyImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10).isActive = true
         keyImageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
         keyImageView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
@@ -125,5 +135,33 @@ class RegisterViewController: UIViewController {
         signInButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10).isActive = true
         signInButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         
+    }
+}
+// MARK: - UITextFieldDelegate
+extension RegisterViewController: UITextFieldDelegate {
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        
+        keyHeightAnchor?.isActive = false
+        keyHeightAnchor = self.keyImageView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.2)
+        keyHeightAnchor?.isActive = true
+        UIView.animate(withDuration: 0.5) {
+           self.view.layoutIfNeeded()
+        }
+    }
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if textField == fullnameTextField {
+            emailTextField.becomeFirstResponder()
+        } else if textField == emailTextField {
+            passwordTextField.becomeFirstResponder()
+        } else {
+            textField.resignFirstResponder()
+            keyHeightAnchor?.isActive = false
+            keyHeightAnchor = self.keyImageView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.45)
+            keyHeightAnchor?.isActive = true
+            UIView.animate(withDuration: 0.5) {
+               self.view.layoutIfNeeded()
+            }
+        }
+        return true
     }
 }

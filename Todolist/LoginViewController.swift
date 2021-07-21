@@ -55,6 +55,7 @@ class LoginViewController: UIViewController {
     }()
     private let passwordTextField: UITextField = {
         let tf = Utilities().textField(withPlaceholder: "Password")
+        tf.textContentType = .password
         tf.isSecureTextEntry = true
         return tf
     }()
@@ -104,13 +105,13 @@ class LoginViewController: UIViewController {
         passwordTextField.delegate = self
         
         view.backgroundColor = UIColor(named: "mainBackground")
-//        lockImageView.heightAnchor.constraint(equalToConstant: view.frame.height/2).isActive = true
         
-        lockHeightAnchor = lockImageView.heightAnchor.constraint(equalToConstant: view.frame.height/2)
+        
+        view.addSubview(lockImageView)
+        lockHeightAnchor = lockImageView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.5)
         // the multiplier 0.3 means we are setting height of topViewForImage to the 30% of view's height.
         lockHeightAnchor?.isActive = true
         
-        view.addSubview(lockImageView)
         lockImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10).isActive = true
         lockImageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
         lockImageView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
@@ -133,7 +134,6 @@ class LoginViewController: UIViewController {
         loginButtonStack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -32).isActive = true
         
         view.addSubview(signUpButton)
-        //        signUpButton.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 10).isActive = true
         signUpButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10).isActive = true
         signUpButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10).isActive = true
         signUpButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
@@ -144,35 +144,12 @@ class LoginViewController: UIViewController {
 extension LoginViewController: UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
         
-
-//        for constraint in self.lockImageView.constraints {
-//            if constraint.firstAnchor == self.lockImageView.heightAnchor {
-//                UIView.animate(withDuration: 0.3) {
-//                    constraint.constant = self.view.frame.height/3
-//                    self.lockImageView.layoutIfNeeded()
-//                }
-//            }
-//        }
-//        self.lockImageView.heightAnchor.constraint(equalToConstant: self.view.frame.height/3).isActive = true
-        
-        
         lockHeightAnchor?.isActive = false
-        lockHeightAnchor = self.lockImageView.heightAnchor.constraint(equalToConstant: self.view.frame.height/3)
+        lockHeightAnchor = self.lockImageView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.3)
         lockHeightAnchor?.isActive = true
         UIView.animate(withDuration: 0.5) {
            self.view.layoutIfNeeded()
         }
-//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3,
-//                                                       delay: 0,
-//                                                       options: []) {
-//
-//            // move
-//            let transpose = CGAffineTransform(translationX: 0, y: 0)
-//            let scale = CGAffineTransform(scaleX: 0.7, y: 0.7)
-//            self.lockImageView.transform = transpose.concatenating(scale)
-//            self.lockImageView.setNeedsDisplay()
-//        } completion: { _ in
-//        }
     }
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if textField == emailTextField {
@@ -180,7 +157,7 @@ extension LoginViewController: UITextFieldDelegate {
         } else {
             textField.resignFirstResponder()
             lockHeightAnchor?.isActive = false
-            lockHeightAnchor = self.lockImageView.heightAnchor.constraint(equalToConstant: self.view.frame.height/2)
+            lockHeightAnchor = self.lockImageView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.5)
             lockHeightAnchor?.isActive = true
             UIView.animate(withDuration: 0.5) {
                self.view.layoutIfNeeded()

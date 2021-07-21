@@ -32,7 +32,7 @@ class LoginViewController: UIViewController {
     private let signUpButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Sign up", for: .normal)
-        button.titleLabel?.textColor = .systemGreen
+        button.setTitleColor(UIColor(named: "lightGreen"), for: .normal)
         button.addTarget(self, action: #selector(signUp), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -57,10 +57,33 @@ class LoginViewController: UIViewController {
         tf.isSecureTextEntry = true
         return tf
     }()
-    private lazy var loginStack: UIStackView = {
+    private lazy var loginTextFieldStack: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [emailContainerView,
                                                    passwordContainerView])
         stack.axis = .vertical
+        stack.spacing = 8
+        stack.distribution = .fillEqually
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        return stack
+    }()
+    private let forgotPasswordButton: UIButton = {
+        let btn = UIButton(type: .system)
+        btn.setTitle("Forgot password?", for: .normal)
+        btn.setTitleColor(.lightGray, for: .normal)
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        return btn
+    }()
+    private let signInButton: UIButton = {
+        let btn = UIButton(type: .system)
+        btn.setTitle("Sign in →", for: .normal)
+        btn.setTitleColor(.white, for: .normal)
+        btn.backgroundColor = UIColor(named: "lightGreen")
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        return btn
+    }()
+    private lazy var loginButtonStack: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [forgotPasswordButton, signInButton])
+        stack.axis = .horizontal
         stack.spacing = 8
         stack.distribution = .fillEqually
         stack.translatesAutoresizingMaskIntoConstraints = false
@@ -89,11 +112,16 @@ class LoginViewController: UIViewController {
         signInTitle.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
         signInTitle.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
         
-        view.addSubview(loginStack)
-        loginStack.topAnchor.constraint(equalTo: signInTitle.bottomAnchor, constant: 10).isActive = true
-        loginStack.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 32).isActive = true
-        loginStack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -32).isActive = true
+        view.addSubview(loginTextFieldStack)
+        loginTextFieldStack.topAnchor.constraint(equalTo: signInTitle.bottomAnchor, constant: 10).isActive = true
+        loginTextFieldStack.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 32).isActive = true
+        loginTextFieldStack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -32).isActive = true
         
+        loginButtonStack.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        view.addSubview(loginButtonStack)
+        loginButtonStack.topAnchor.constraint(equalTo: loginTextFieldStack.bottomAnchor, constant: 10).isActive = true
+        loginButtonStack.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 32).isActive = true
+        loginButtonStack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -32).isActive = true
         
         view.addSubview(signUpButton)
 //        signUpButton.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 10).isActive = true

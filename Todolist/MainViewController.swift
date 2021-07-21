@@ -89,7 +89,7 @@ class MainViewController: UIViewController {
     // MARK: - Functions
     private func configureUI() {
         
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor(named: "mainBackground")
         tableView.register(TodoCell.self, forCellReuseIdentifier: "cell")
         
         paperFolderImageView.heightAnchor.constraint(equalToConstant: view.frame.height/3).isActive = true

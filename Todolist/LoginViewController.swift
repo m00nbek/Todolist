@@ -31,11 +31,11 @@ class LoginViewController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    private let signUpButton: UIButton = {
+    private let showSignUpButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Sign up", for: .normal)
         button.setTitleColor(UIColor(named: "lightGreen"), for: .normal)
-        button.addTarget(self, action: #selector(signUp), for: .touchUpInside)
+        button.addTarget(self, action: #selector(showSignUp), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -99,19 +99,21 @@ class LoginViewController: UIViewController {
         let todo = Todo(title: "Crazy todo", isCompleted: false)
         DatabaseManager.shared.insertTodo(todo: todo) 
     }
-    @objc private func signUp() {
+    @objc private func showSignUp() {
         let vc = RegisterViewController()
         vc.navigationItem.setHidesBackButton(true, animated: true)
         navigationController?.pushViewController(vc, animated: true)
     }
     @objc private func signIn() {
-        guard let email = emailTextField.text else {return}
-        DatabaseManager.shared.userExists(with: email) { exists in
-            if exists {
-                print("user exists")
-            } else {
-                print("user doesn't exist")
+        guard let email = emailTextField.text?.lowercased() else {return}
+        guard let password = passwordTextField.text?.lowercased() else {return}
+        Auth.auth().signIn(withEmail: email, password: password) { [weak self] authResult, error in
+            if error != nil {
+                print("Error occured while signing in user")
+                return
             }
+            print("Successfully signed in")
+            self?.dismiss(animated: true, completion: nil)
         }
     }
     // MARK: - API
@@ -150,10 +152,10 @@ class LoginViewController: UIViewController {
         loginButtonStack.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 32).isActive = true
         loginButtonStack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -32).isActive = true
         
-        view.addSubview(signUpButton)
-        signUpButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10).isActive = true
-        signUpButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10).isActive = true
-        signUpButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+        view.addSubview(showSignUpButton)
+        showSignUpButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10).isActive = true
+        showSignUpButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10).isActive = true
+        showSignUpButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         
     }
 }

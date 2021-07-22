@@ -31,11 +31,11 @@ class RegisterViewController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    private let signInButton: UIButton = {
+    private let showSignInButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Sign In", for: .normal)
         button.setTitleColor(UIColor(named: "lightGreen"), for: .normal)
-        button.addTarget(self, action: #selector(signIn), for: .touchUpInside)
+        button.addTarget(self, action: #selector(showSignIn), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -90,7 +90,7 @@ class RegisterViewController: UIViewController {
         return btn
     }()
     // MARK: - Selectors
-    @objc private func signIn() {
+    @objc private func showSignIn() {
         navigationController?.popViewController(animated: true)
     }
     @objc private func signUp() {
@@ -146,11 +146,11 @@ class RegisterViewController: UIViewController {
 //        signUpButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 32).isActive = true
 //        signUpButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -32).isActive = true
         
-        view.addSubview(signInButton)
+        view.addSubview(showSignInButton)
         //        signUpButton.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 10).isActive = true
-        signInButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10).isActive = true
-        signInButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10).isActive = true
-        signInButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+        showSignInButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10).isActive = true
+        showSignInButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10).isActive = true
+        showSignInButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         
     }
 }

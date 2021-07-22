@@ -140,14 +140,7 @@ class RegisterViewController: UIViewController {
         loginTextFieldStack.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 32).isActive = true
         loginTextFieldStack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -32).isActive = true
         
-//        signUpButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
-//        view.addSubview(signUpButton)
-//        signUpButton.topAnchor.constraint(equalTo: loginTextFieldStack.bottomAnchor, constant: 10).isActive = true
-//        signUpButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 32).isActive = true
-//        signUpButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -32).isActive = true
-        
         view.addSubview(showSignInButton)
-        //        signUpButton.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 10).isActive = true
         showSignInButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10).isActive = true
         showSignInButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10).isActive = true
         showSignInButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true

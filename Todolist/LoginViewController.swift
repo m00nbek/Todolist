@@ -96,8 +96,7 @@ class LoginViewController: UIViewController {
     }()
     // MARK: - Selectors
     @objc private func forgotPassword() {
-        let todo = Todo(title: "Crazy todo", isCompleted: false)
-        DatabaseManager.shared.insertTodo(todo: todo) 
+        
     }
     @objc private func showSignUp() {
         let vc = RegisterViewController()

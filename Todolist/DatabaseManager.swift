@@ -20,6 +20,66 @@ final class DatabaseManager {
         return safeEmail
     }
 }
+// MARK: - Delete Todo
+extension DatabaseManager {
+    public func deleteTodo(index: Int) {
+        guard let email = Auth.auth().currentUser?.email else {fatalError("Cannot get current user's email")}
+        let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
+        
+        database.child(safeEmail).child("todos").observeSingleEvent(of: .value) { snapshot in
+            if var todos = snapshot.value as? [[String: Any]] {
+                todos.remove(at: index)
+                self.database.child(safeEmail).child("todos").setValue(todos) { error, _ in
+                    if error != nil {
+                        print("Error occured while deleting todo from db")
+                        return
+                    }
+                    print("Successfully deletd todo from db")
+                }
+            } else {
+                print("Can't cast down todos")
+            }
+        }
+    }
+}
+// MARK: - UpdateTodo
+extension DatabaseManager {
+    public func updateTodo(index: Int) {
+        guard let email = Auth.auth().currentUser?.email else {fatalError("Cannot get current user's email")}
+        let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
+
+        database.child(safeEmail).child("todos").child("\(index)").observeSingleEvent(of: .value) { snapshot in
+            if let todo = snapshot.value as? [String: Any] {
+                if var isCompleted = todo["isCompleted"] as? Bool {
+                    isCompleted.toggle()
+                    self.database.child(safeEmail).child("todos").child("\(index)").updateChildValues(["isCompleted": isCompleted])
+                }
+            }
+        }
+    }
+}
+// MARK: - FetchTodos
+extension DatabaseManager {
+    public func fetchTodos(completion: @escaping([Todo]) -> Void) {
+        guard let email = Auth.auth().currentUser?.email else {fatalError("Cannot get current user's email")}
+        let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
+        
+        database.child(safeEmail).child("todos").observeSingleEvent(of: .value) { snapshot in
+            if let todos = snapshot.value as? [[String: Any]] {
+                var resultTodos = [Todo]()
+                for todo in todos {
+                    if let title = todo["title"] as? String, let isCompleted = todo["isCompleted"] as? Bool {
+                        let todo = Todo(title: title, isCompleted: isCompleted)
+                        resultTodos.append(todo)
+                    }
+                }
+                completion(resultTodos)
+            } else {
+                print("Can't get todos data from snapshot")
+            }
+        }
+    }
+}
 // MARK: - InsertTodo
 extension DatabaseManager {
     public func insertTodo(todo: Todo) {
@@ -35,12 +95,12 @@ extension DatabaseManager {
                     "isCompleted": todo.isCompleted
                 ]
                 todos.append(newTodo)
-                self.database.child(safeEmail).setValue(todos) { error, _ in
+                self.database.child(safeEmail).child("todos").setValue(todos) { error, _ in
                     if error != nil {
                         print("Error occured while inserting todo into db")
                         return
                     }
-                    print("Successfully inserted user into db")
+                    print("Successfully inserted todo into db")
                 }
             } else {
                 print("Can't cast it down")

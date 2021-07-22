@@ -15,12 +15,18 @@ class MainViewController: UIViewController {
         authUserAndUpdateUI()
         configureUI()
     }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        fetchTodos()
+    }
     // MARK: - Authentication Functions
     private func authUserAndUpdateUI() {
         if Auth.auth().currentUser?.uid == nil {
             let nav = UINavigationController(rootViewController: LoginViewController())
             nav.modalPresentationStyle = .fullScreen
             present(nav, animated: true)
+        } else {
+            fetchTodos()
         }
     }
     // MARK: - Properties
@@ -94,6 +100,7 @@ class MainViewController: UIViewController {
             // append new item to the array & reloadData()
             guard let text = alertTextField.text else {return}
             let newTodo = Todo(title: text, isCompleted: false)
+            self?.createTodo(todo: newTodo)
             self?.todos.append(newTodo)
             self?.tableView.reloadData()
         }
@@ -101,6 +108,18 @@ class MainViewController: UIViewController {
         present(alert, animated: true, completion: nil)
     }
     // MARK: - API
+    private func updateTodo(index: Int) {
+        DatabaseManager.shared.updateTodo(index: index)
+    }
+    private func createTodo(todo: Todo) {
+        DatabaseManager.shared.insertTodo(todo: todo)
+    }
+    private func fetchTodos() {
+        // fetch and set todos arr
+        DatabaseManager.shared.fetchTodos { todos in
+            self.todos = todos
+        }
+    }
     // MARK: - Functions
     private func configureUI() {
         
@@ -157,6 +176,7 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         todos[indexPath.row].isCompleted.toggle()
+        updateTodo(index: indexPath.row)
     }
     
 }
@@ -164,6 +184,7 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
 extension MainViewController: TodoCellDelegate {
     func deleteItemAt(_ index: Int) {
         todos.remove(at: index)
+        DatabaseManager.shared.deleteTodo(index: index)
         tableView.reloadData()
     }
 }

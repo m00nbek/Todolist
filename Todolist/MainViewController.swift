@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Firebase
 
 class MainViewController: UIViewController {
     // MARK: - Lifecycle
@@ -16,14 +17,13 @@ class MainViewController: UIViewController {
     }
     // MARK: - Authentication Functions
     private func authUserAndUpdateUI() {
-        if !isLoggedIn {
+        if Auth.auth().currentUser?.uid == nil {
             let nav = UINavigationController(rootViewController: LoginViewController())
             nav.modalPresentationStyle = .fullScreen
             present(nav, animated: true)
         }
     }
     // MARK: - Properties
-    private var isLoggedIn = false
     var todos = [Todo]() {
         didSet {
             tableView.reloadData()
@@ -59,7 +59,22 @@ class MainViewController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
+    private lazy var logOutButton: UIBarButtonItem = {
+        let button = UIBarButtonItem()
+        button.target = self
+        button.action = #selector(logOut)
+        button.title = "Log Out"
+        return button
+    }()
     // MARK: - Selectors
+    @objc private func logOut() {
+        do {
+            try Auth.auth().signOut()
+            authUserAndUpdateUI()
+        } catch {
+            print("Can't log out")
+        }
+    }
     @objc private func addNewTask() {
         let alert = UIAlertController(title: "New Task", message: "Add new task", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
@@ -91,6 +106,8 @@ class MainViewController: UIViewController {
         
         view.backgroundColor = UIColor(named: "mainBackground")
         tableView.register(TodoCell.self, forCellReuseIdentifier: "cell")
+        
+        navigationItem.setRightBarButton(logOutButton, animated: true)
         
         paperFolderImageView.heightAnchor.constraint(equalToConstant: view.frame.height/3).isActive = true
         

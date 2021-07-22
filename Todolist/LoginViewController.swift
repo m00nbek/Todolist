@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Firebase
 
 class LoginViewController: UIViewController {
     // MARK: - Lifecycle
@@ -72,6 +73,7 @@ class LoginViewController: UIViewController {
         let btn = UIButton(type: .system)
         btn.setTitle("Forgot password?", for: .normal)
         btn.setTitleColor(.lightGray, for: .normal)
+        btn.addTarget(self, action: #selector(forgotPassword), for: .touchUpInside)
         btn.translatesAutoresizingMaskIntoConstraints = false
         return btn
     }()
@@ -80,6 +82,7 @@ class LoginViewController: UIViewController {
         btn.setTitle("Sign in →", for: .normal)
         btn.setTitleColor(.white, for: .normal)
         btn.backgroundColor = UIColor(named: "lightGreen")
+        btn.addTarget(self, action: #selector(signIn), for: .touchUpInside)
         btn.translatesAutoresizingMaskIntoConstraints = false
         return btn
     }()
@@ -92,10 +95,24 @@ class LoginViewController: UIViewController {
         return stack
     }()
     // MARK: - Selectors
+    @objc private func forgotPassword() {
+        let todo = Todo(title: "Crazy todo", isCompleted: false)
+        DatabaseManager.shared.insertTodo(todo: todo) 
+    }
     @objc private func signUp() {
-        let nav = UINavigationController(rootViewController: RegisterViewController())
-        nav.modalPresentationStyle = .fullScreen
-        present(nav, animated: true)
+        let vc = RegisterViewController()
+        vc.navigationItem.setHidesBackButton(true, animated: true)
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    @objc private func signIn() {
+        guard let email = emailTextField.text else {return}
+        DatabaseManager.shared.userExists(with: email) { exists in
+            if exists {
+                print("user exists")
+            } else {
+                print("user doesn't exist")
+            }
+        }
     }
     // MARK: - API
     // MARK: - Functions

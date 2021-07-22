@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FirebaseAuth
 
 class RegisterViewController: UIViewController {
     // MARK: - Lifecycle
@@ -84,14 +85,30 @@ class RegisterViewController: UIViewController {
         btn.setTitle("Sign Up →", for: .normal)
         btn.setTitleColor(.white, for: .normal)
         btn.backgroundColor = UIColor(named: "lightGreen")
+        btn.addTarget(self, action: #selector(signUp), for: .touchUpInside)
         btn.translatesAutoresizingMaskIntoConstraints = false
         return btn
     }()
     // MARK: - Selectors
     @objc private func signIn() {
-        let nav = UINavigationController(rootViewController: LoginViewController())
-        nav.modalPresentationStyle = .fullScreen
-        present(nav, animated: true)
+        navigationController?.popViewController(animated: true)
+    }
+    @objc private func signUp() {
+        // Create user
+        guard let email = emailTextField.text?.lowercased() else {return}
+        guard let password = passwordTextField.text?.lowercased() else {return}
+        Auth.auth().createUser(withEmail: email, password: password) { [weak self] authResult, error in
+            if error != nil {
+                print("Error occured while creating account")
+                print(error!.localizedDescription)
+                return
+            }
+            print("successfully created account")
+            // create db for that user with email
+            DatabaseManager.shared.insertUser(with: email)
+            // show MainViewController.... dissmiss self
+            self?.dismiss(animated: true, completion: nil)
+        }
     }
     // MARK: - API
     // MARK: - Functions
@@ -161,7 +178,9 @@ extension RegisterViewController: UITextFieldDelegate {
             UIView.animate(withDuration: 0.5) {
                self.view.layoutIfNeeded()
             }
+            
         }
         return true
     }
+    
 }

@@ -39,7 +39,31 @@ class MainViewController: UIViewController {
         }
     }
     private let spinner = JGProgressHUD(style: .dark)
-    var alert = UIAlertController(title: "New Task", message: "Add new task", preferredStyle: .alert)
+    private lazy var alert: UIAlertController = {
+        var alert = UIAlertController(title: "New Task", message: "Add new task", preferredStyle: .alert)
+        var alertTextField = UITextField()
+        alert.addTextField { textField in
+            textField.translatesAutoresizingMaskIntoConstraints = false
+            textField.placeholder = "Add New Task"
+            alertTextField = textField
+            alertTextField.delegate = self
+        }
+        let action = UIAlertAction(title: "Add", style: .default) { [weak self] _ in
+            // append new item to the array & reloadData()
+            guard let text = alertTextField.text else {return}
+            if !text.replacingOccurrences(of: " ", with: "").isEmpty {
+                let newTodo = Todo(title: text, isCompleted: false)
+                self?.createTodo(todo: newTodo)
+                self?.todos.append(newTodo)
+                self?.tableView.reloadData()
+                alertTextField.text = nil
+            }
+        }
+        action.isEnabled = false
+        alert.addAction(action)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        return alert
+    }()
     private let paperFolderImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "paper_folder")
@@ -90,30 +114,6 @@ class MainViewController: UIViewController {
         }
     }
     @objc private func addNewTask() {
-        var alertTextField: UITextField = {
-            let tf = UITextField()
-            tf.placeholder = "Add New Task"
-            return tf
-        }()
-        
-        alert.addTextField { textField in
-            textField.translatesAutoresizingMaskIntoConstraints = false
-            alertTextField = textField
-            alertTextField.delegate = self
-        }
-        let action = UIAlertAction(title: "Add", style: .default) { [weak self] _ in
-            // append new item to the array & reloadData()
-            guard let text = alertTextField.text else {return}
-            if !text.replacingOccurrences(of: " ", with: "").isEmpty {
-                let newTodo = Todo(title: text, isCompleted: false)
-                self?.createTodo(todo: newTodo)
-                self?.todos.append(newTodo)
-                self?.tableView.reloadData()
-            }
-        }
-        action.isEnabled = false
-        alert.addAction(action)
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         present(alert, animated: true, completion: nil)
     }
     // MARK: - API

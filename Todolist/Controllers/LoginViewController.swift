@@ -109,31 +109,33 @@ class LoginViewController: UIViewController {
         navigationController?.pushViewController(vc, animated: true)
     }
     @objc private func signIn() {
-        spinner.show(in: view)
-        guard let email = emailTextField.text?.lowercased() else {return}
-        guard let password = passwordTextField.text?.lowercased() else {return}
-        
-        DatabaseManager.shared.userExists(with: email) { exists in
-            if exists {
-                Auth.auth().signIn(withEmail: email, password: password) { [weak self] authResult, error in
-                    if error != nil {
-                        print("Error occured while signing in user")
-                        return
+        if signInButton.alpha == 1 {
+            spinner.show(in: view)
+            guard let email = emailTextField.text?.lowercased() else {return}
+            guard let password = passwordTextField.text?.lowercased() else {return}
+            
+            DatabaseManager.shared.userExists(with: email) { exists in
+                if exists {
+                    Auth.auth().signIn(withEmail: email, password: password) { [weak self] authResult, error in
+                        if error != nil {
+                            print("Error occured while signing in user")
+                            return
+                        }
+                        print("Successfully signed in")
+                        self?.spinner.dismiss()
+                        self?.dismiss(animated: true, completion: nil)
                     }
-                    print("Successfully signed in")
-                    self?.spinner.dismiss()
-                    self?.dismiss(animated: true, completion: nil)
+                } else {
+                    self.spinner.dismiss()
+                    let alert = UIAlertController(title: "User not found", message: "Do you want to Sign Up?", preferredStyle: .alert)
+                    let action = UIAlertAction(title: "Sign Up", style: .default) { action in
+                        // show the register Controller
+                        self.showSignUp()
+                    }
+                    alert.addAction(action)
+                    alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+                    self.present(alert, animated: true, completion: nil)
                 }
-            } else {
-                self.spinner.dismiss()
-                let alert = UIAlertController(title: "User not found", message: "Do you want to Sign Up?", preferredStyle: .alert)
-                let action = UIAlertAction(title: "Sign Up", style: .default) { action in
-                    // show the register Controller
-                    self.showSignUp()
-                }
-                alert.addAction(action)
-                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-                self.present(alert, animated: true, completion: nil)
             }
         }
     }
@@ -183,6 +185,11 @@ class LoginViewController: UIViewController {
 // MARK: - UITextFieldDelegate
 extension LoginViewController: UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
+        if textField == emailTextField {
+            updateUI(isValid: false, in: emailContainerView)
+        } else {
+            updateUI(isValid: false, in: passwordContainerView)
+        }
         
         lockHeightAnchor?.isActive = false
         lockHeightAnchor = self.lockImageView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.3)
@@ -196,6 +203,7 @@ extension LoginViewController: UITextFieldDelegate {
             passwordTextField.becomeFirstResponder()
         } else {
             textField.resignFirstResponder()
+            signIn()
             lockHeightAnchor?.isActive = false
             lockHeightAnchor = self.lockImageView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.5)
             lockHeightAnchor?.isActive = true
@@ -206,6 +214,9 @@ extension LoginViewController: UITextFieldDelegate {
         return true
     }
     func textFieldDidChangeSelection(_ textField: UITextField) {
+        regexValidation(textField: textField)
+    }
+    func regexValidation(textField: UITextField) {
         if !textField.text!.isEmpty {
             if textField.placeholder == "Email" {
                 if isValidEmail(textField.text!) && !textField.text!.contains(" ") {
@@ -224,9 +235,15 @@ extension LoginViewController: UITextFieldDelegate {
                     updateUI(isValid: false, in: passwordContainerView)
                 }
             }
+        } else {
+            if textField == emailTextField {
+                updateUI(isValid: false, in: emailContainerView)
+            } else {
+                updateUI(isValid: false, in: passwordContainerView)
+            }
         }
     }
-    func updateUI(isValid: Bool, in view: UIView = UIView()) {
+    func updateUI(isValid: Bool, in view: UIView) {
         if !isValid {
             view.layer.borderWidth = 2
             signInButton.alpha = 0.5

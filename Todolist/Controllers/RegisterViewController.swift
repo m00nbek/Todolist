@@ -18,6 +18,7 @@ class RegisterViewController: UIViewController {
     // MARK: - Properties
     private var validEmail: Bool?
     private var validPass: Bool?
+    private var validFullname: Bool?
     private var keyHeightAnchor: NSLayoutConstraint?
     private let spinner = JGProgressHUD(style: .dark)
     private let keyImageView: UIImageView = {
@@ -61,15 +62,16 @@ class RegisterViewController: UIViewController {
     }()
     private let fullnameTextField: UITextField = {
         let tf = Utilities().textField(withPlaceholder: "Full name")
-        tf.textContentType = .password
         return tf
     }()
     private let emailTextField: UITextField = {
         let tf = Utilities().textField(withPlaceholder: "Email")
+        tf.autocapitalizationType = .none
         return tf
     }()
     private let passwordTextField: UITextField = {
         let tf = Utilities().textField(withPlaceholder: "Password")
+        tf.textContentType = .oneTimeCode
         tf.isSecureTextEntry = true
         return tf
     }()
@@ -99,40 +101,42 @@ class RegisterViewController: UIViewController {
         navigationController?.popViewController(animated: true)
     }
     @objc private func signUp() {
-        // Create user
-        spinner.show(in: view)
-        guard let email = emailTextField.text?.lowercased() else {return}
-        guard let password = passwordTextField.text?.lowercased() else {return}
-        DatabaseManager.shared.userExists(with: email) { exists in
-            if !exists {
-                Auth.auth().createUser(withEmail: email, password: password) { [weak self] authResult, error in
-                    if error != nil {
-                        print("Error occured while creating account")
-                        print(error!.localizedDescription)
-                        return
-                    }
-                    print("successfully created account")
-                    // create db for that user with email
-                    DatabaseManager.shared.insertUser(with: email) { success in
-                        if success {
-                            // show MainViewController.... dissmiss self
-                            self?.spinner.dismiss()
-                            self?.dismiss(animated: true, completion: nil)
-                        } else {
-                            // make red border in the textFields and check for error
+        if signUpButton.alpha == 1 {
+            // Create user
+            spinner.show(in: view)
+            guard let email = emailTextField.text?.lowercased() else {return}
+            guard let password = passwordTextField.text?.lowercased() else {return}
+            DatabaseManager.shared.userExists(with: email) { exists in
+                if !exists {
+                    Auth.auth().createUser(withEmail: email, password: password) { [weak self] authResult, error in
+                        if error != nil {
+                            print("Error occured while creating account")
+                            print(error!.localizedDescription)
+                            return
+                        }
+                        print("successfully created account")
+                        // create db for that user with email
+                        DatabaseManager.shared.insertUser(with: email) { success in
+                            if success {
+                                // show MainViewController.... dissmiss self
+                                self?.spinner.dismiss()
+                                self?.dismiss(animated: true, completion: nil)
+                            } else {
+                                // make red border in the textFields and check for error
+                            }
                         }
                     }
+                } else {
+                    self.spinner.dismiss()
+                    let alert = UIAlertController(title: "User already exists", message: "Do you want to Sign In?", preferredStyle: .alert)
+                    let action = UIAlertAction(title: "Sign In", style: .default) { action in
+                        // show the register Controller
+                        self.showSignIn()
+                    }
+                    alert.addAction(action)
+                    alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+                    self.present(alert, animated: true, completion: nil)
                 }
-            } else {
-                self.spinner.dismiss()
-                let alert = UIAlertController(title: "User already exists", message: "Do you want to Sign In?", preferredStyle: .alert)
-                let action = UIAlertAction(title: "Sign In", style: .default) { action in
-                    // show the register Controller
-                    self.showSignIn()
-                }
-                alert.addAction(action)
-                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-                self.present(alert, animated: true, completion: nil)
             }
         }
     }
@@ -176,6 +180,13 @@ class RegisterViewController: UIViewController {
 // MARK: - UITextFieldDelegate
 extension RegisterViewController: UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
+        if textField == emailTextField {
+            updateUI(isValid: false, in: emailContainerView)
+        } else if textField == fullnameTextField {
+            updateUI(isValid: false, in: fullnameContainerView)
+        } else {
+            updateUI(isValid: false, in: passwordContainerView)
+        }
         
         keyHeightAnchor?.isActive = false
         keyHeightAnchor = self.keyImageView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.2)
@@ -191,6 +202,7 @@ extension RegisterViewController: UITextFieldDelegate {
             passwordTextField.becomeFirstResponder()
         } else {
             textField.resignFirstResponder()
+            signUp()
             keyHeightAnchor?.isActive = false
             keyHeightAnchor = self.keyImageView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.45)
             keyHeightAnchor?.isActive = true
@@ -202,8 +214,19 @@ extension RegisterViewController: UITextFieldDelegate {
         return true
     }
     func textFieldDidChangeSelection(_ textField: UITextField) {
+        regexValidation(textField: textField)
+    }
+    func regexValidation(textField: UITextField) {
         if !textField.text!.isEmpty {
-            if textField.placeholder == "Email" {
+            if textField.placeholder == "Full name" {
+                if textField.text!.count >= 3 {
+                    validFullname = true
+                    updateUI(isValid: true, in: fullnameContainerView)
+                } else {
+                    validFullname = false
+                    updateUI(isValid: false, in: fullnameContainerView)
+                }
+            } else if textField.placeholder == "Email" {
                 if isValidEmail(textField.text!) && !textField.text!.contains(" ") {
                     validEmail = true
                     updateUI(isValid: true, in: emailContainerView)
@@ -220,9 +243,11 @@ extension RegisterViewController: UITextFieldDelegate {
                     updateUI(isValid: false, in: passwordContainerView)
                 }
             }
+        } else {
+            updateUI(isValid: false, in: textField)
         }
     }
-    func updateUI(isValid: Bool, in view: UIView = UIView()) {
+    func updateUI(isValid: Bool, in view: UIView) {
         if !isValid {
             view.layer.borderWidth = 2
             signUpButton.alpha = 0.5
@@ -230,8 +255,8 @@ extension RegisterViewController: UITextFieldDelegate {
         } else {
             view.layer.borderWidth = 0
         }
-        if validEmail != nil && validPass != nil {
-            if validEmail! && validPass! {
+        if validEmail != nil && validPass != nil && validFullname != nil {
+            if validEmail! && validPass! && validFullname! {
                 signUpButton.alpha = 1
                 signUpButton.isUserInteractionEnabled = true
             }

@@ -15,6 +15,8 @@ class RegisterViewController: UIViewController {
         configureUI()
     }
     // MARK: - Properties
+    private var validEmail: Bool?
+    private var validPass: Bool?
     private var keyHeightAnchor: NSLayoutConstraint?
     private let keyImageView: UIImageView = {
         let imageView = UIImageView()
@@ -71,9 +73,9 @@ class RegisterViewController: UIViewController {
     }()
     private lazy var loginTextFieldStack: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [fullnameContainerView,
-                                                emailContainerView,
-                                                passwordContainerView,
-                                                signUpButton])
+                                                   emailContainerView,
+                                                   passwordContainerView,
+                                                   signUpButton])
         stack.axis = .vertical
         stack.spacing = 8
         stack.distribution = .fillEqually
@@ -86,6 +88,7 @@ class RegisterViewController: UIViewController {
         btn.setTitleColor(.white, for: .normal)
         btn.backgroundColor = UIColor(named: "lightGreen")
         btn.addTarget(self, action: #selector(signUp), for: .touchUpInside)
+        btn.isUserInteractionEnabled = false
         btn.translatesAutoresizingMaskIntoConstraints = false
         return btn
     }()
@@ -97,21 +100,34 @@ class RegisterViewController: UIViewController {
         // Create user
         guard let email = emailTextField.text?.lowercased() else {return}
         guard let password = passwordTextField.text?.lowercased() else {return}
-        Auth.auth().createUser(withEmail: email, password: password) { [weak self] authResult, error in
-            if error != nil {
-                print("Error occured while creating account")
-                print(error!.localizedDescription)
-                return
-            }
-            print("successfully created account")
-            // create db for that user with email
-            DatabaseManager.shared.insertUser(with: email) { success in
-                if success {
-                    // show MainViewController.... dissmiss self
-                    self?.dismiss(animated: true, completion: nil)
-                } else {
-                    // make red border in the textFields and check for error
+        DatabaseManager.shared.userExists(with: email) { exists in
+            if !exists {
+                Auth.auth().createUser(withEmail: email, password: password) { [weak self] authResult, error in
+                    if error != nil {
+                        print("Error occured while creating account")
+                        print(error!.localizedDescription)
+                        return
+                    }
+                    print("successfully created account")
+                    // create db for that user with email
+                    DatabaseManager.shared.insertUser(with: email) { success in
+                        if success {
+                            // show MainViewController.... dissmiss self
+                            self?.dismiss(animated: true, completion: nil)
+                        } else {
+                            // make red border in the textFields and check for error
+                        }
+                    }
                 }
+            } else {
+                let alert = UIAlertController(title: "User already exists", message: "Do you want to Sign In?", preferredStyle: .alert)
+                let action = UIAlertAction(title: "Sign In", style: .default) { action in
+                    // show the register Controller
+                    self.showSignIn()
+                }
+                alert.addAction(action)
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+                self.present(alert, animated: true, completion: nil)
             }
         }
     }
@@ -160,7 +176,7 @@ extension RegisterViewController: UITextFieldDelegate {
         keyHeightAnchor = self.keyImageView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.2)
         keyHeightAnchor?.isActive = true
         UIView.animate(withDuration: 0.5) {
-           self.view.layoutIfNeeded()
+            self.view.layoutIfNeeded()
         }
     }
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -174,11 +190,62 @@ extension RegisterViewController: UITextFieldDelegate {
             keyHeightAnchor = self.keyImageView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.45)
             keyHeightAnchor?.isActive = true
             UIView.animate(withDuration: 0.5) {
-               self.view.layoutIfNeeded()
+                self.view.layoutIfNeeded()
             }
             
         }
         return true
     }
-    
+    func textFieldDidChangeSelection(_ textField: UITextField) {
+        if !textField.text!.isEmpty {
+            if textField.placeholder == "Email" {
+                if isValidEmail(textField.text!) && !textField.text!.contains(" ") {
+                    validEmail = true
+                    updateUI(isValid: true, in: emailContainerView)
+                } else {
+                    validEmail = false
+                    updateUI(isValid: false, in: emailContainerView)
+                }
+            } else if textField.placeholder == "Password" {
+                if textField.text!.count >= 6 && !textField.text!.contains(" ") {
+                    validPass = true
+                    updateUI(isValid: true, in: passwordContainerView)
+                } else {
+                    validPass = false
+                    updateUI(isValid: false, in: passwordContainerView)
+                }
+            }
+        }
+    }
+    func updateUI(isValid: Bool, in view: UIView = UIView()) {
+        if !isValid {
+            view.layer.borderWidth = 2
+            signUpButton.alpha = 0.5
+            signUpButton.isUserInteractionEnabled = false
+        } else {
+            view.layer.borderWidth = 0
+        }
+        if validEmail != nil && validPass != nil {
+            if validEmail! && validPass! {
+                signUpButton.alpha = 1
+                signUpButton.isUserInteractionEnabled = true
+            }
+        }
+    }
+    func isValidEmail(_ email: String) -> Bool {
+        let emailPattern = "[A-Z0-9a-z.-_]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,3}"
+        do {
+            let regex = try NSRegularExpression(pattern: emailPattern)
+            let nsString = email as NSString
+            let results = regex.matches(in: email, range: NSRange(location: 0, length: nsString.length))
+            
+            if results.count != 0 {
+                return true
+            } else {
+                return false
+            }
+        } catch {
+            fatalError("DEBUG: \(error)")
+        }
+    }
 }

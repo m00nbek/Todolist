@@ -15,6 +15,8 @@ class LoginViewController: UIViewController {
         configureUI()
     }
     // MARK: - Properties
+    private var validEmail: Bool?
+    private var validPass: Bool?
     private var lockHeightAnchor: NSLayoutConstraint?
     private let lockImageView: UIImageView = {
         let imageView = UIImageView()
@@ -83,6 +85,7 @@ class LoginViewController: UIViewController {
         btn.setTitleColor(.white, for: .normal)
         btn.backgroundColor = UIColor(named: "lightGreen")
         btn.addTarget(self, action: #selector(signIn), for: .touchUpInside)
+        btn.isUserInteractionEnabled = false
         btn.translatesAutoresizingMaskIntoConstraints = false
         return btn
     }()
@@ -106,13 +109,27 @@ class LoginViewController: UIViewController {
     @objc private func signIn() {
         guard let email = emailTextField.text?.lowercased() else {return}
         guard let password = passwordTextField.text?.lowercased() else {return}
-        Auth.auth().signIn(withEmail: email, password: password) { [weak self] authResult, error in
-            if error != nil {
-                print("Error occured while signing in user")
-                return
+        
+        DatabaseManager.shared.userExists(with: email) { exists in
+            if exists {
+                Auth.auth().signIn(withEmail: email, password: password) { [weak self] authResult, error in
+                    if error != nil {
+                        print("Error occured while signing in user")
+                        return
+                    }
+                    print("Successfully signed in")
+                    self?.dismiss(animated: true, completion: nil)
+                }
+            } else {
+                let alert = UIAlertController(title: "User not found", message: "Do you want to Sign Up?", preferredStyle: .alert)
+                let action = UIAlertAction(title: "Sign Up", style: .default) { action in
+                    // show the register Controller
+                    self.showSignUp()
+                }
+                alert.addAction(action)
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+                self.present(alert, animated: true, completion: nil)
             }
-            print("Successfully signed in")
-            self?.dismiss(animated: true, completion: nil)
         }
     }
     // MARK: - API
@@ -182,5 +199,57 @@ extension LoginViewController: UITextFieldDelegate {
             }
         }
         return true
+    }
+    func textFieldDidChangeSelection(_ textField: UITextField) {
+        if !textField.text!.isEmpty {
+            if textField.placeholder == "Email" {
+                if isValidEmail(textField.text!) && !textField.text!.contains(" ") {
+                    validEmail = true
+                    updateUI(isValid: true, in: emailContainerView)
+                } else {
+                    validEmail = false
+                    updateUI(isValid: false, in: emailContainerView)
+                }
+            } else if textField.placeholder == "Password" {
+                if textField.text!.count >= 6 && !textField.text!.contains(" ") {
+                    validPass = true
+                    updateUI(isValid: true, in: passwordContainerView)
+                } else {
+                    validPass = false
+                    updateUI(isValid: false, in: passwordContainerView)
+                }
+            }
+        }
+    }
+    func updateUI(isValid: Bool, in view: UIView = UIView()) {
+        if !isValid {
+            view.layer.borderWidth = 2
+            signInButton.alpha = 0.5
+            signInButton.isUserInteractionEnabled = false
+        } else {
+            view.layer.borderWidth = 0
+        }
+        if validEmail != nil && validPass != nil {
+            if validEmail! && validPass! {
+                signInButton.alpha = 1
+                signInButton.isUserInteractionEnabled = true
+            }
+        }
+    }
+    func isValidEmail(_ email: String) -> Bool {
+        let emailPattern = "[A-Z0-9a-z.-_]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,3}"
+        do {
+            let regex = try NSRegularExpression(pattern: emailPattern)
+            let nsString = email as NSString
+            let results = regex.matches(in: email, range: NSRange(location: 0, length: nsString.length))
+            
+            if results.count != 0 {
+                return true
+            } else {
+                return false
+            }
+        } catch {
+            fatalError("DEBUG: \(error)")
+        }
     }
 }

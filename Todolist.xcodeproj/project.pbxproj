@@ -94,9 +94,9 @@
 		AB8AE0F226AA8A1D00CEDFF5 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				AB8CD23C269DAC5B00B425D0 /* MainViewController.swift */,
-				AB8CD23E269DADE700B425D0 /* RegisterViewController.swift */,
 				AB8CD240269DADF300B425D0 /* LoginViewController.swift */,
+				AB8CD23E269DADE700B425D0 /* RegisterViewController.swift */,
+				AB8CD23C269DAC5B00B425D0 /* MainViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";

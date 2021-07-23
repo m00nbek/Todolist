@@ -11,8 +11,14 @@ import Firebase
 final class DatabaseManager {
     static let shared = DatabaseManager()
     
-    private let ref = Database.database().reference()
-    let database = Database.database().reference()
+    private let database = Database.database().reference()
+        
+    public func currentSafeEmail() -> String {
+        guard let currentEmail = Auth.auth().currentUser?.email else {fatalError()}
+        var safeEmail = currentEmail.replacingOccurrences(of: ".", with: "-")
+        safeEmail = safeEmail.replacingOccurrences(of: "@", with: "-")
+        return safeEmail
+    }
     
     static func safeEmail(emailAddress: String) -> String {
         var safeEmail = emailAddress.replacingOccurrences(of: ".", with: "-")
@@ -23,13 +29,14 @@ final class DatabaseManager {
 // MARK: - Delete Todo
 extension DatabaseManager {
     public func deleteTodo(index: Int) {
-        guard let email = Auth.auth().currentUser?.email else {fatalError("Cannot get current user's email")}
-        let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
-        
-        database.child(safeEmail).child("todos").observeSingleEvent(of: .value) { snapshot in
+        if index == 0 {
+            print("You cannot delete first item!")
+            return
+        }
+        database.child(currentSafeEmail()).child("todos").observeSingleEvent(of: .value) { snapshot in
             if var todos = snapshot.value as? [[String: Any]] {
                 todos.remove(at: index)
-                self.database.child(safeEmail).child("todos").setValue(todos) { error, _ in
+                self.database.child(self.currentSafeEmail()).child("todos").setValue(todos) { error, _ in
                     if error != nil {
                         print("Error occured while deleting todo from db")
                         return
@@ -45,14 +52,15 @@ extension DatabaseManager {
 // MARK: - UpdateTodo
 extension DatabaseManager {
     public func updateTodo(index: Int) {
-        guard let email = Auth.auth().currentUser?.email else {fatalError("Cannot get current user's email")}
-        let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
-
-        database.child(safeEmail).child("todos").child("\(index)").observeSingleEvent(of: .value) { snapshot in
+        if index == 0 {
+            print("You cannot update first item!")
+            return
+        }
+        database.child(currentSafeEmail()).child("todos").child("\(index)").observeSingleEvent(of: .value) { snapshot in
             if let todo = snapshot.value as? [String: Any] {
                 if var isCompleted = todo["isCompleted"] as? Bool {
                     isCompleted.toggle()
-                    self.database.child(safeEmail).child("todos").child("\(index)").updateChildValues(["isCompleted": isCompleted])
+                    self.database.child(self.currentSafeEmail()).child("todos").child("\(index)").updateChildValues(["isCompleted": isCompleted])
                 }
             }
         }
@@ -61,10 +69,7 @@ extension DatabaseManager {
 // MARK: - FetchTodos
 extension DatabaseManager {
     public func fetchTodos(completion: @escaping([Todo]) -> Void) {
-        guard let email = Auth.auth().currentUser?.email else {fatalError("Cannot get current user's email")}
-        let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
-        
-        database.child(safeEmail).child("todos").observeSingleEvent(of: .value) { snapshot in
+        database.child(currentSafeEmail()).child("todos").observeSingleEvent(of: .value) { snapshot in
             if let todos = snapshot.value as? [[String: Any]] {
                 var resultTodos = [Todo]()
                 for todo in todos {
@@ -73,6 +78,9 @@ extension DatabaseManager {
                         resultTodos.append(todo)
                     }
                 }
+                // remove the first item from the array
+                resultTodos.removeFirst()
+                
                 completion(resultTodos)
             } else {
                 print("Can't get todos data from snapshot")
@@ -84,9 +92,7 @@ extension DatabaseManager {
 extension DatabaseManager {
     public func insertTodo(todo: Todo) {
         /// insert todo function is gonna insert todo into db for that specific email
-        guard let email = Auth.auth().currentUser?.email else {return}
-        let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
-        database.child(safeEmail).child("todos").observeSingleEvent(of: .value) { snapshot in
+       database.child(currentSafeEmail()).child("todos").observeSingleEvent(of: .value) { snapshot in
             // if todos exist then append new todo into the db for specific email
             if var todos = snapshot.value as? [[String: Any]] {
                 // append to todos dictionary
@@ -95,7 +101,7 @@ extension DatabaseManager {
                     "isCompleted": todo.isCompleted
                 ]
                 todos.append(newTodo)
-                self.database.child(safeEmail).child("todos").setValue(todos) { error, _ in
+                self.database.child(self.currentSafeEmail()).child("todos").setValue(todos) { error, _ in
                     if error != nil {
                         print("Error occured while inserting todo into db")
                         return
@@ -110,7 +116,7 @@ extension DatabaseManager {
 }
 // MARK: - Insert User
 extension DatabaseManager {
-    public func insertUser(with email: String) {
+    public func insertUser(with email: String, completion: @escaping(Bool) -> Void) {
         let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
         database.observeSingleEvent(of: .value) { snapshot in
             if let _ = snapshot.value as? [String: Any] {
@@ -124,9 +130,11 @@ extension DatabaseManager {
                         ]
                     ], withCompletionBlock: { error, _ in
                     if error != nil {
+                        completion(false)
                         print("Error occured while inserting user into db")
                         return
                     }
+                    completion(true)
                     print("Successfully inserted user into db")
                 }
                 )
@@ -145,9 +153,11 @@ extension DatabaseManager {
                     ]
                 self.database.setValue(users) { error, _ in
                     if error != nil {
+                        completion(false)
                         print("Error occured while inserting users collection into db")
                         return
                     }
+                    completion(true)
                     print("Successfully inserted users collection into db")
                 }
             }

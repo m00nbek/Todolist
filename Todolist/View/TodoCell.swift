@@ -89,14 +89,14 @@ class TodoCell: UITableViewCell {
     }()
     private let view: UIView = {
         let view = UIView()
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor(named: "mainBackground")
         view.isUserInteractionEnabled = true
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     let circleImageView: UIImageView = {
         let iv = UIImageView()
-        iv.backgroundColor = .white
+        iv.backgroundColor = UIColor(named: "mainBackground")
         iv.layer.borderColor = UIColor.lightGray.cgColor
         iv.layer.borderWidth = 1
         iv.contentMode = .scaleAspectFit

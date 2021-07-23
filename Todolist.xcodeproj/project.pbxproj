@@ -73,6 +73,34 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
+		AB8AE0F026AA8A0500CEDFF5 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				ABF2BAA626A961CC00AFAC40 /* DatabaseManager.swift */,
+				AB8CD246269DC3CD00B425D0 /* Todo.swift */,
+				AB2FA77B26A31EAE0067349E /* Utilities.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		AB8AE0F126AA8A1300CEDFF5 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				AB8CD244269DBC9F00B425D0 /* TodoCell.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		AB8AE0F226AA8A1D00CEDFF5 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				AB8CD23C269DAC5B00B425D0 /* MainViewController.swift */,
+				AB8CD23E269DADE700B425D0 /* RegisterViewController.swift */,
+				AB8CD240269DADF300B425D0 /* LoginViewController.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
 		AB8CD21C269DA38300B425D0 = {
 			isa = PBXGroup;
 			children = (
@@ -96,13 +124,9 @@
 			children = (
 				AB8CD228269DA38300B425D0 /* AppDelegate.swift */,
 				AB8CD22A269DA38300B425D0 /* SceneDelegate.swift */,
-				AB8CD23C269DAC5B00B425D0 /* MainViewController.swift */,
-				AB8CD244269DBC9F00B425D0 /* TodoCell.swift */,
-				AB8CD246269DC3CD00B425D0 /* Todo.swift */,
-				AB8CD23E269DADE700B425D0 /* RegisterViewController.swift */,
-				ABF2BAA626A961CC00AFAC40 /* DatabaseManager.swift */,
-				AB8CD240269DADF300B425D0 /* LoginViewController.swift */,
-				AB2FA77B26A31EAE0067349E /* Utilities.swift */,
+				AB8AE0F026AA8A0500CEDFF5 /* Model */,
+				AB8AE0F126AA8A1300CEDFF5 /* View */,
+				AB8AE0F226AA8A1D00CEDFF5 /* Controllers */,
 				AB8CD22E269DA38300B425D0 /* Main.storyboard */,
 				AB8CD231269DA38400B425D0 /* Assets.xcassets */,
 				AB8CD233269DA38400B425D0 /* LaunchScreen.storyboard */,

@@ -105,9 +105,14 @@ class RegisterViewController: UIViewController {
             }
             print("successfully created account")
             // create db for that user with email
-            DatabaseManager.shared.insertUser(with: email)
-            // show MainViewController.... dissmiss self
-            self?.dismiss(animated: true, completion: nil)
+            DatabaseManager.shared.insertUser(with: email) { success in
+                if success {
+                    // show MainViewController.... dissmiss self
+                    self?.dismiss(animated: true, completion: nil)
+                } else {
+                    // make red border in the textFields and check for error
+                }
+            }
         }
     }
     // MARK: - API

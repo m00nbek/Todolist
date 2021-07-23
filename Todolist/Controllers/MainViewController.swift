@@ -17,7 +17,9 @@ class MainViewController: UIViewController {
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        fetchTodos()
+        if Auth.auth().currentUser?.uid != nil {
+            fetchTodos()
+        }
     }
     // MARK: - Authentication Functions
     private func authUserAndUpdateUI() {
@@ -52,6 +54,7 @@ class MainViewController: UIViewController {
     }()
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
+        tableView.backgroundColor = UIColor(named: "mainBackground")
         tableView.delegate = self
         tableView.dataSource = self
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -109,7 +112,7 @@ class MainViewController: UIViewController {
     }
     // MARK: - API
     private func updateTodo(index: Int) {
-        DatabaseManager.shared.updateTodo(index: index)
+        DatabaseManager.shared.updateTodo(index: index + 1)
     }
     private func createTodo(todo: Todo) {
         DatabaseManager.shared.insertTodo(todo: todo)
@@ -184,7 +187,7 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
 extension MainViewController: TodoCellDelegate {
     func deleteItemAt(_ index: Int) {
         todos.remove(at: index)
-        DatabaseManager.shared.deleteTodo(index: index)
+        DatabaseManager.shared.deleteTodo(index: index + 1)
         tableView.reloadData()
     }
 }

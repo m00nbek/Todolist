@@ -32,6 +32,7 @@ class MainViewController: UIViewController {
         }
     }
     // MARK: - Properties
+    var alert = UIAlertController(title: "New Task", message: "Add new task", preferredStyle: .alert)
     var todos = [Todo]() {
         didSet {
             tableView.reloadData()
@@ -85,29 +86,30 @@ class MainViewController: UIViewController {
         }
     }
     @objc private func addNewTask() {
-        let alert = UIAlertController(title: "New Task", message: "Add new task", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        
         var alertTextField: UITextField = {
             let tf = UITextField()
             tf.placeholder = "Add New Task"
-            tf.translatesAutoresizingMaskIntoConstraints = false
             return tf
         }()
         
         alert.addTextField { textField in
             textField.translatesAutoresizingMaskIntoConstraints = false
             alertTextField = textField
+            alertTextField.delegate = self
         }
         let action = UIAlertAction(title: "Add", style: .default) { [weak self] _ in
             // append new item to the array & reloadData()
             guard let text = alertTextField.text else {return}
-            let newTodo = Todo(title: text, isCompleted: false)
-            self?.createTodo(todo: newTodo)
-            self?.todos.append(newTodo)
-            self?.tableView.reloadData()
+            if !text.replacingOccurrences(of: " ", with: "").isEmpty {
+                let newTodo = Todo(title: text, isCompleted: false)
+                self?.createTodo(todo: newTodo)
+                self?.todos.append(newTodo)
+                self?.tableView.reloadData()
+            }
         }
+        action.isEnabled = false
         alert.addAction(action)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         present(alert, animated: true, completion: nil)
     }
     // MARK: - API
@@ -189,5 +191,16 @@ extension MainViewController: TodoCellDelegate {
         todos.remove(at: index)
         DatabaseManager.shared.deleteTodo(index: index + 1)
         tableView.reloadData()
+    }
+}
+// MARK: - UITextFieldDelegate
+extension MainViewController: UITextFieldDelegate {
+    func textFieldDidChangeSelection(_ textField: UITextField) {
+        guard let text = textField.text else {return}
+        if !text.replacingOccurrences(of: " ", with: "").isEmpty {
+            alert.actions[0].isEnabled = true
+        } else {
+            alert.actions[0].isEnabled = false
+        }
     }
 }

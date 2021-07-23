@@ -7,6 +7,7 @@
 
 import UIKit
 import Firebase
+import JGProgressHUD
 
 class MainViewController: UIViewController {
     // MARK: - Lifecycle
@@ -32,12 +33,13 @@ class MainViewController: UIViewController {
         }
     }
     // MARK: - Properties
-    var alert = UIAlertController(title: "New Task", message: "Add new task", preferredStyle: .alert)
     var todos = [Todo]() {
         didSet {
             tableView.reloadData()
         }
     }
+    private let spinner = JGProgressHUD(style: .dark)
+    var alert = UIAlertController(title: "New Task", message: "Add new task", preferredStyle: .alert)
     private let paperFolderImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "paper_folder")
@@ -78,9 +80,11 @@ class MainViewController: UIViewController {
     }()
     // MARK: - Selectors
     @objc private func logOut() {
+        spinner.show(in: view)
         do {
             try Auth.auth().signOut()
             authUserAndUpdateUI()
+            spinner.dismiss()
         } catch {
             print("Can't log out")
         }
@@ -121,9 +125,11 @@ class MainViewController: UIViewController {
     }
     private func fetchTodos() {
         // fetch and set todos arr
+        spinner.show(in: view)
         DatabaseManager.shared.fetchTodos { todos in
             self.todos = todos
         }
+        spinner.dismiss()
     }
     // MARK: - Functions
     private func configureUI() {

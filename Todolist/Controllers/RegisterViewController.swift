@@ -7,6 +7,7 @@
 
 import UIKit
 import FirebaseAuth
+import JGProgressHUD
 
 class RegisterViewController: UIViewController {
     // MARK: - Lifecycle
@@ -18,6 +19,7 @@ class RegisterViewController: UIViewController {
     private var validEmail: Bool?
     private var validPass: Bool?
     private var keyHeightAnchor: NSLayoutConstraint?
+    private let spinner = JGProgressHUD(style: .dark)
     private let keyImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "key")
@@ -98,6 +100,7 @@ class RegisterViewController: UIViewController {
     }
     @objc private func signUp() {
         // Create user
+        spinner.show(in: view)
         guard let email = emailTextField.text?.lowercased() else {return}
         guard let password = passwordTextField.text?.lowercased() else {return}
         DatabaseManager.shared.userExists(with: email) { exists in
@@ -113,6 +116,7 @@ class RegisterViewController: UIViewController {
                     DatabaseManager.shared.insertUser(with: email) { success in
                         if success {
                             // show MainViewController.... dissmiss self
+                            self?.spinner.dismiss()
                             self?.dismiss(animated: true, completion: nil)
                         } else {
                             // make red border in the textFields and check for error
@@ -120,6 +124,7 @@ class RegisterViewController: UIViewController {
                     }
                 }
             } else {
+                self.spinner.dismiss()
                 let alert = UIAlertController(title: "User already exists", message: "Do you want to Sign In?", preferredStyle: .alert)
                 let action = UIAlertAction(title: "Sign In", style: .default) { action in
                     // show the register Controller

@@ -7,6 +7,7 @@
 
 import UIKit
 import Firebase
+import JGProgressHUD
 
 class LoginViewController: UIViewController {
     // MARK: - Lifecycle
@@ -18,6 +19,7 @@ class LoginViewController: UIViewController {
     private var validEmail: Bool?
     private var validPass: Bool?
     private var lockHeightAnchor: NSLayoutConstraint?
+    private let spinner = JGProgressHUD(style: .dark)
     private let lockImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "lock")
@@ -107,6 +109,7 @@ class LoginViewController: UIViewController {
         navigationController?.pushViewController(vc, animated: true)
     }
     @objc private func signIn() {
+        spinner.show(in: view)
         guard let email = emailTextField.text?.lowercased() else {return}
         guard let password = passwordTextField.text?.lowercased() else {return}
         
@@ -118,9 +121,11 @@ class LoginViewController: UIViewController {
                         return
                     }
                     print("Successfully signed in")
+                    self?.spinner.dismiss()
                     self?.dismiss(animated: true, completion: nil)
                 }
             } else {
+                self.spinner.dismiss()
                 let alert = UIAlertController(title: "User not found", message: "Do you want to Sign Up?", preferredStyle: .alert)
                 let action = UIAlertAction(title: "Sign Up", style: .default) { action in
                     // show the register Controller

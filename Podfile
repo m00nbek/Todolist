@@ -8,5 +8,6 @@ target 'Todolist' do
   # Pods for Todolist
   pod 'Firebase/Core'
   pod 'Firebase/Auth'
-  pod 'Firebase/Database'  
+  pod 'Firebase/Database'
+  pod 'JGProgressHUD' 
 end

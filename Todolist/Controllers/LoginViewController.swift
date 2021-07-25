@@ -37,7 +37,10 @@ class LoginViewController: UIViewController {
     }()
     private let showSignUpButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Sign up", for: .normal)
+        let attributedTitle = NSMutableAttributedString(string: "Don't have an account? ",
+                                                        attributes: [.font: UIFont.systemFont(ofSize: 15)])
+        attributedTitle.append(NSAttributedString(string: "Sign Up", attributes: [.font: UIFont.boldSystemFont(ofSize: 15)]))
+        button.setAttributedTitle(attributedTitle, for: .normal)
         button.setTitleColor(UIColor(named: "lightGreen"), for: .normal)
         button.addTarget(self, action: #selector(showSignUp), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false

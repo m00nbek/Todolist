@@ -38,7 +38,10 @@ class RegisterViewController: UIViewController {
     }()
     private let showSignInButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Sign In", for: .normal)
+        let attributedTitle = NSMutableAttributedString(string: "Already have an account? ",
+                                                        attributes: [.font: UIFont.systemFont(ofSize: 15)])
+        attributedTitle.append(NSAttributedString(string: "Sign In", attributes: [.font: UIFont.boldSystemFont(ofSize: 15)]))
+        button.setAttributedTitle(attributedTitle, for: .normal)
         button.setTitleColor(UIColor(named: "lightGreen"), for: .normal)
         button.addTarget(self, action: #selector(showSignIn), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -71,7 +74,7 @@ class RegisterViewController: UIViewController {
     }()
     private let passwordTextField: UITextField = {
         let tf = Utilities().textField(withPlaceholder: "Password")
-        tf.textContentType = .oneTimeCode
+        tf.textContentType = .password
         tf.isSecureTextEntry = true
         return tf
     }()

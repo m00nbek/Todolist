@@ -9,6 +9,7 @@ import UIKit
 import FirebaseAuth
 import JGProgressHUD
 
+@available(iOS 13.0, *)
 class RegisterViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -16,9 +17,7 @@ class RegisterViewController: UIViewController {
         configureUI()
     }
     // MARK: - Properties
-    private var validEmail: Bool?
-    private var validPass: Bool?
-    private var validFullname: Bool?
+    private lazy var validator = Validator(emailContainerView: emailContainerView, passwordContainerView: passwordContainerView, fullnameContainerView: fullnameContainerView, button: signUpButton)
     private var keyHeightAnchor: NSLayoutConstraint?
     private let spinner = JGProgressHUD(style: .dark)
     private let keyImageView: UIImageView = {
@@ -74,8 +73,8 @@ class RegisterViewController: UIViewController {
     }()
     private let passwordTextField: UITextField = {
         let tf = Utilities().textField(withPlaceholder: "Password")
-        tf.textContentType = .password
         tf.isSecureTextEntry = true
+        tf.textContentType = .password
         return tf
     }()
     private lazy var loginTextFieldStack: UIStackView = {
@@ -184,11 +183,11 @@ class RegisterViewController: UIViewController {
 extension RegisterViewController: UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
         if textField == emailTextField {
-            updateUI(isValid: false, in: emailContainerView)
+            validator.updateUI(isValid: false, in: emailContainerView, for: signUpButton)
         } else if textField == fullnameTextField {
-            updateUI(isValid: false, in: fullnameContainerView)
+            validator.updateUI(isValid: false, in: fullnameContainerView, for: signUpButton)
         } else {
-            updateUI(isValid: false, in: passwordContainerView)
+            validator.updateUI(isValid: false, in: passwordContainerView, for: signUpButton)
         }
         
         keyHeightAnchor?.isActive = false
@@ -217,68 +216,7 @@ extension RegisterViewController: UITextFieldDelegate {
         return true
     }
     func textFieldDidChangeSelection(_ textField: UITextField) {
-        regexValidation(textField: textField)
+        validator.regexValidation(textField: textField)
     }
-    func regexValidation(textField: UITextField) {
-        if !textField.text!.isEmpty {
-            if textField.placeholder == "Full name" {
-                if textField.text!.count >= 3 {
-                    validFullname = true
-                    updateUI(isValid: true, in: fullnameContainerView)
-                } else {
-                    validFullname = false
-                    updateUI(isValid: false, in: fullnameContainerView)
-                }
-            } else if textField.placeholder == "Email" {
-                if isValidEmail(textField.text!) && !textField.text!.contains(" ") {
-                    validEmail = true
-                    updateUI(isValid: true, in: emailContainerView)
-                } else {
-                    validEmail = false
-                    updateUI(isValid: false, in: emailContainerView)
-                }
-            } else if textField.placeholder == "Password" {
-                if textField.text!.count >= 6 && !textField.text!.contains(" ") {
-                    validPass = true
-                    updateUI(isValid: true, in: passwordContainerView)
-                } else {
-                    validPass = false
-                    updateUI(isValid: false, in: passwordContainerView)
-                }
-            }
-        } else {
-            updateUI(isValid: false, in: textField)
-        }
-    }
-    func updateUI(isValid: Bool, in view: UIView) {
-        if !isValid {
-            view.layer.borderWidth = 2
-            signUpButton.alpha = 0.5
-            signUpButton.isUserInteractionEnabled = false
-        } else {
-            view.layer.borderWidth = 0
-        }
-        if validEmail != nil && validPass != nil && validFullname != nil {
-            if validEmail! && validPass! && validFullname! {
-                signUpButton.alpha = 1
-                signUpButton.isUserInteractionEnabled = true
-            }
-        }
-    }
-    func isValidEmail(_ email: String) -> Bool {
-        let emailPattern = "[A-Z0-9a-z.-_]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,3}"
-        do {
-            let regex = try NSRegularExpression(pattern: emailPattern)
-            let nsString = email as NSString
-            let results = regex.matches(in: email, range: NSRange(location: 0, length: nsString.length))
-            
-            if results.count != 0 {
-                return true
-            } else {
-                return false
-            }
-        } catch {
-            fatalError("DEBUG: \(error)")
-        }
-    }
+    
 }

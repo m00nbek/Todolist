@@ -16,8 +16,7 @@ class LoginViewController: UIViewController {
         configureUI()
     }
     // MARK: - Properties
-    private var validEmail: Bool?
-    private var validPass: Bool?
+    private lazy var validator = Validator(emailContainerView: emailContainerView, passwordContainerView: passwordContainerView, button: signInButton)
     private var lockHeightAnchor: NSLayoutConstraint?
     private let spinner = JGProgressHUD(style: .dark)
     private let lockImageView: UIImageView = {
@@ -187,11 +186,12 @@ class LoginViewController: UIViewController {
 }
 // MARK: - UITextFieldDelegate
 extension LoginViewController: UITextFieldDelegate {
+    
     func textFieldDidBeginEditing(_ textField: UITextField) {
         if textField == emailTextField {
-            updateUI(isValid: false, in: emailContainerView)
+            validator.updateUI(isValid: false, in: emailContainerView, for: signInButton)
         } else {
-            updateUI(isValid: false, in: passwordContainerView)
+            validator.updateUI(isValid: false, in: passwordContainerView, for: signInButton)
         }
         
         lockHeightAnchor?.isActive = false
@@ -217,64 +217,7 @@ extension LoginViewController: UITextFieldDelegate {
         return true
     }
     func textFieldDidChangeSelection(_ textField: UITextField) {
-        regexValidation(textField: textField)
+        validator.regexValidation(textField: textField)
     }
-    func regexValidation(textField: UITextField) {
-        if !textField.text!.isEmpty {
-            if textField.placeholder == "Email" {
-                if isValidEmail(textField.text!) && !textField.text!.contains(" ") {
-                    validEmail = true
-                    updateUI(isValid: true, in: emailContainerView)
-                } else {
-                    validEmail = false
-                    updateUI(isValid: false, in: emailContainerView)
-                }
-            } else if textField.placeholder == "Password" {
-                if textField.text!.count >= 6 && !textField.text!.contains(" ") {
-                    validPass = true
-                    updateUI(isValid: true, in: passwordContainerView)
-                } else {
-                    validPass = false
-                    updateUI(isValid: false, in: passwordContainerView)
-                }
-            }
-        } else {
-            if textField == emailTextField {
-                updateUI(isValid: false, in: emailContainerView)
-            } else {
-                updateUI(isValid: false, in: passwordContainerView)
-            }
-        }
-    }
-    func updateUI(isValid: Bool, in view: UIView) {
-        if !isValid {
-            view.layer.borderWidth = 2
-            signInButton.alpha = 0.5
-            signInButton.isUserInteractionEnabled = false
-        } else {
-            view.layer.borderWidth = 0
-        }
-        if validEmail != nil && validPass != nil {
-            if validEmail! && validPass! {
-                signInButton.alpha = 1
-                signInButton.isUserInteractionEnabled = true
-            }
-        }
-    }
-    func isValidEmail(_ email: String) -> Bool {
-        let emailPattern = "[A-Z0-9a-z.-_]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,3}"
-        do {
-            let regex = try NSRegularExpression(pattern: emailPattern)
-            let nsString = email as NSString
-            let results = regex.matches(in: email, range: NSRange(location: 0, length: nsString.length))
-            
-            if results.count != 0 {
-                return true
-            } else {
-                return false
-            }
-        } catch {
-            fatalError("DEBUG: \(error)")
-        }
-    }
+    
 }

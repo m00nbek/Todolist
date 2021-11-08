@@ -17,6 +17,7 @@
 		AB8CD241269DADF300B425D0 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8CD240269DADF300B425D0 /* LoginViewController.swift */; };
 		AB8CD245269DBC9F00B425D0 /* TodoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8CD244269DBC9F00B425D0 /* TodoCell.swift */; };
 		AB8CD247269DC3CD00B425D0 /* Todo.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8CD246269DC3CD00B425D0 /* Todo.swift */; };
+		ABD92E7B26AD27EA00CC2DDF /* Validator.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD92E7A26AD27EA00CC2DDF /* Validator.swift */; };
 		ABF2BAA526A95BFA00AFAC40 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = ABF2BAA426A95BFA00AFAC40 /* GoogleService-Info.plist */; };
 		ABF2BAA726A961CC00AFAC40 /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF2BAA626A961CC00AFAC40 /* DatabaseManager.swift */; };
 		BCC3F47C362F7B0E918CEF5C /* Pods_Todolist.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C520978CEE346B5FA394E043 /* Pods_Todolist.framework */; };
@@ -36,6 +37,7 @@
 		AB8CD240269DADF300B425D0 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		AB8CD244269DBC9F00B425D0 /* TodoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoCell.swift; sourceTree = "<group>"; };
 		AB8CD246269DC3CD00B425D0 /* Todo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Todo.swift; sourceTree = "<group>"; };
+		ABD92E7A26AD27EA00CC2DDF /* Validator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Validator.swift; sourceTree = "<group>"; };
 		ABF2BAA426A95BFA00AFAC40 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		ABF2BAA626A961CC00AFAC40 /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
 		B4DF0185B3DA118AB8DC3B91 /* Pods-Todolist.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Todolist.release.xcconfig"; path = "Target Support Files/Pods-Todolist/Pods-Todolist.release.xcconfig"; sourceTree = "<group>"; };
@@ -77,6 +79,7 @@
 				ABF2BAA626A961CC00AFAC40 /* DatabaseManager.swift */,
 				AB8CD246269DC3CD00B425D0 /* Todo.swift */,
 				AB2FA77B26A31EAE0067349E /* Utilities.swift */,
+				ABD92E7A26AD27EA00CC2DDF /* Validator.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -250,6 +253,7 @@
 			files = (
 				AB8CD247269DC3CD00B425D0 /* Todo.swift in Sources */,
 				AB8CD229269DA38300B425D0 /* AppDelegate.swift in Sources */,
+				ABD92E7B26AD27EA00CC2DDF /* Validator.swift in Sources */,
 				AB8CD245269DBC9F00B425D0 /* TodoCell.swift in Sources */,
 				AB8CD23D269DAC5B00B425D0 /* MainViewController.swift in Sources */,
 				AB8CD22B269DA38300B425D0 /* SceneDelegate.swift in Sources */,
@@ -325,7 +329,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -380,7 +384,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -409,7 +413,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -442,7 +446,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

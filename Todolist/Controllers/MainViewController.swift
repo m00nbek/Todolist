@@ -9,6 +9,7 @@ import UIKit
 import Firebase
 import JGProgressHUD
 
+@available(iOS 13.0, *)
 class MainViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {

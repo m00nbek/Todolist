@@ -29,7 +29,9 @@ class Validator {
             if fullnameContainer == nil {
                 // for Login
                 if textField.placeholder == "Email" {
+                    print("Checking email")
                     if isValidEmail(textField.text!) && !textField.text!.contains(" ") {
+                        print("Email is valid")
                         isValidEmail = true
                         updateUI(isValid: true, in: emailContainer, for: button)
                     } else {
@@ -92,6 +94,7 @@ class Validator {
     }
     // MARK: - updateUI
     func updateUI(isValid: Bool, in containerView: UIView, for button: UIButton) {
+        print("validator's updating UI")
         if !isValid {
             containerView.layer.borderWidth = 2
             button.alpha = 0.5

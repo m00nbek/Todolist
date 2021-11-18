@@ -9,7 +9,6 @@ import UIKit
 import Firebase
 import JGProgressHUD
 
-@available(iOS 13.0, *)
 class MainViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -48,6 +47,7 @@ class MainViewController: UIViewController {
             textField.placeholder = "Add New Task"
             alertTextField = textField
             alertTextField.delegate = self
+            alertTextField.addTarget(self, action: #selector(self.textFieldDidChange(_:)), for: .editingChanged)
         }
         let action = UIAlertAction(title: "Add", style: .default) { [weak self] _ in
             // append new item to the array & reloadData()
@@ -85,6 +85,7 @@ class MainViewController: UIViewController {
         tableView.backgroundColor = UIColor(named: "mainBackground")
         tableView.delegate = self
         tableView.dataSource = self
+        tableView.separatorStyle = .none
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
     }()
@@ -135,6 +136,7 @@ class MainViewController: UIViewController {
     // MARK: - Functions
     private func configureUI() {
         
+        
         view.backgroundColor = UIColor(named: "mainBackground")
         tableView.register(TodoCell.self, forCellReuseIdentifier: "cell")
         
@@ -143,7 +145,7 @@ class MainViewController: UIViewController {
         paperFolderImageView.heightAnchor.constraint(equalToConstant: view.frame.height/3).isActive = true
         
         view.addSubview(paperFolderImageView)
-        paperFolderImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10).isActive = true
+        paperFolderImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 30).isActive = true
         paperFolderImageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
         paperFolderImageView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
         
@@ -162,7 +164,7 @@ class MainViewController: UIViewController {
         newTaskButton.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 10).isActive = true
         newTaskButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10).isActive = true
         newTaskButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10).isActive = true
-        newTaskButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+        newTaskButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20).isActive = true
     }
 }
 
@@ -195,6 +197,7 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
 // MARK: - TodoCellDelegate
 extension MainViewController: TodoCellDelegate {
     func deleteItemAt(_ index: Int) {
+        print("Deleting item")
         todos.remove(at: index)
         DatabaseManager.shared.deleteTodo(index: index + 1)
         tableView.reloadData()
@@ -202,6 +205,14 @@ extension MainViewController: TodoCellDelegate {
 }
 // MARK: - UITextFieldDelegate
 extension MainViewController: UITextFieldDelegate {
+    @objc func textFieldDidChange(_ textField: UITextField) {
+        guard let text = textField.text else {return}
+        if !text.replacingOccurrences(of: " ", with: "").isEmpty {
+            alert.actions[0].isEnabled = true
+        } else {
+            alert.actions[0].isEnabled = false
+        }
+    }
     func textFieldDidChangeSelection(_ textField: UITextField) {
         guard let text = textField.text else {return}
         if !text.replacingOccurrences(of: " ", with: "").isEmpty {

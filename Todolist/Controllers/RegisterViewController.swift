@@ -9,7 +9,6 @@ import UIKit
 import FirebaseAuth
 import JGProgressHUD
 
-@available(iOS 13.0, *)
 class RegisterViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -47,18 +46,21 @@ class RegisterViewController: UIViewController {
         return button
     }()
     private lazy var emailContainerView: UIView = {
-        guard let image = UIImage(systemName: "envelope") else {fatalError()}
+//        guard let image = UIImage(systemName: "envelope") else {fatalError()}
+        guard let image = UIImage(named: "paper_folder") else {fatalError()}
         let view = Utilities().inputContainerView(withImage: image, textField: emailTextField)
         view.layer.borderColor = UIColor.red.cgColor
         return view
     }()
     private lazy var passwordContainerView: UIView = {
-        guard let image = UIImage(systemName: "lock") else {fatalError()}
+//        guard let image = UIImage(systemName: "lock") else {fatalError()}
+        guard let image = UIImage(named: "lock") else {fatalError()}
         let view = Utilities().inputContainerView(withImage: image, textField: passwordTextField)
         return view
     }()
     private lazy var fullnameContainerView: UIView = {
-        guard let image = UIImage(systemName: "person") else {fatalError()}
+//        guard let image = UIImage(systemName: "person") else {fatalError()}
+        guard let image = UIImage(named: "lock") else {fatalError()}
         let view = Utilities().inputContainerView(withImage: image, textField: fullnameTextField)
         return view
     }()
@@ -111,6 +113,7 @@ class RegisterViewController: UIViewController {
             DatabaseManager.shared.userExists(with: email) { exists in
                 if !exists {
                     Auth.auth().createUser(withEmail: email, password: password) { [weak self] authResult, error in
+                        print("Creating")
                         if error != nil {
                             print("Error occured while creating account")
                             print(error!.localizedDescription)
@@ -146,6 +149,9 @@ class RegisterViewController: UIViewController {
     // MARK: - Functions
     private func configureUI() {
         // textField delegates
+        fullnameTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+        emailTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+        passwordTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
         fullnameTextField.delegate = self
         emailTextField.delegate = self
         passwordTextField.delegate = self
@@ -163,7 +169,7 @@ class RegisterViewController: UIViewController {
         
         signUpTitle.heightAnchor.constraint(equalToConstant: 50).isActive = true
         view.addSubview(signUpTitle)
-        signUpTitle.topAnchor.constraint(equalTo: keyImageView.bottomAnchor, constant: 10).isActive = true
+        signUpTitle.topAnchor.constraint(equalTo: keyImageView.bottomAnchor, constant: 20).isActive = true
         signUpTitle.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
         signUpTitle.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
         
@@ -175,7 +181,7 @@ class RegisterViewController: UIViewController {
         view.addSubview(showSignInButton)
         showSignInButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10).isActive = true
         showSignInButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10).isActive = true
-        showSignInButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+        showSignInButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20).isActive = true
         
     }
 }
@@ -216,6 +222,10 @@ extension RegisterViewController: UITextFieldDelegate {
         return true
     }
     func textFieldDidChangeSelection(_ textField: UITextField) {
+        validator.regexValidation(textField: textField)
+    }
+    
+    @objc func textFieldDidChange(_ textField: UITextField) {
         validator.regexValidation(textField: textField)
     }
     

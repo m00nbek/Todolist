@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol TodoCellDelegate {
+protocol TodoCellDelegate: AnyObject {
     func deleteItemAt(_ index: Int)
 }
 class TodoCell: UITableViewCell {
@@ -55,7 +55,7 @@ class TodoCell: UITableViewCell {
         deleteButton.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
     }
     // MARK: - Properties
-    var delegate: TodoCellDelegate?
+    weak var delegate: TodoCellDelegate?
     var todoIndex: Int?
     var todoText: String?
     var isCompleted: Bool? {
@@ -104,7 +104,7 @@ class TodoCell: UITableViewCell {
         iv.translatesAutoresizingMaskIntoConstraints = false
         return iv
     }()
-    private let deleteButton: UIButton = {
+    private lazy var deleteButton: UIButton = {
         let button = UIButton(type: .system)
         button.tintColor = .lightGray
         button.setTitle("x", for: .normal)
@@ -117,6 +117,7 @@ class TodoCell: UITableViewCell {
     // MARK: - Selectors
     @objc private func deleteTapped() {
         // delete item from array
+        print("delete tapped")
         guard let todoIndex = todoIndex else {return}
         delegate?.deleteItemAt(todoIndex)
         removeFromSuperview()

@@ -13,6 +13,7 @@ class LoginViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.navigationBar.isHidden = true
         configureUI()
     }
     // MARK: - Properties
@@ -46,13 +47,15 @@ class LoginViewController: UIViewController {
         return button
     }()
     private lazy var emailContainerView: UIView = {
-        guard let image = UIImage(systemName: "envelope") else {fatalError()}
+//        guard let image = UIImage(systemName: "envelope") else {fatalError()}
+        guard let image = UIImage(named: "paper_folder") else {fatalError()}
         let view = Utilities().inputContainerView(withImage: image, textField: emailTextField)
         view.layer.borderColor = UIColor.red.cgColor
         return view
     }()
     private lazy var passwordContainerView: UIView = {
-        guard let image = UIImage(systemName: "lock") else {fatalError()}
+//        guard let image = UIImage(systemName: "lock") else {fatalError()}
+        guard let image = UIImage(named: "lock") else {fatalError()}
         let view = Utilities().inputContainerView(withImage: image, textField: passwordTextField)
         return view
     }()
@@ -145,6 +148,8 @@ class LoginViewController: UIViewController {
     // MARK: - Functions
     private func configureUI() {
         // textField delegates
+        emailTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+        passwordTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
         emailTextField.delegate = self
         passwordTextField.delegate = self
         
@@ -180,7 +185,7 @@ class LoginViewController: UIViewController {
         view.addSubview(showSignUpButton)
         showSignUpButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10).isActive = true
         showSignUpButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10).isActive = true
-        showSignUpButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+        showSignUpButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20).isActive = true
         
     }
 }
@@ -188,7 +193,9 @@ class LoginViewController: UIViewController {
 extension LoginViewController: UITextFieldDelegate {
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
+        print("didBegin checking")
         if textField == emailTextField {
+            print("Typing email")
             validator.updateUI(isValid: false, in: emailContainerView, for: signInButton)
         } else {
             validator.updateUI(isValid: false, in: passwordContainerView, for: signInButton)
@@ -216,8 +223,26 @@ extension LoginViewController: UITextFieldDelegate {
         }
         return true
     }
-    func textFieldDidChangeSelection(_ textField: UITextField) {
+    @objc func textFieldDidChange(_ textField: UITextField) {
         validator.regexValidation(textField: textField)
+        
+        
+//        print("cheeekin")
+//        if textField == emailTextField {
+//            print("Typing email")
+//            validator.updateUI(isValid: false, in: emailContainerView, for: signInButton)
+//        } else {
+//            validator.updateUI(isValid: false, in: passwordContainerView, for: signInButton)
+//        }
+//
+//        lockHeightAnchor?.isActive = false
+//        lockHeightAnchor = self.lockImageView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.3)
+//        lockHeightAnchor?.isActive = true
+//        UIView.animate(withDuration: 0.5) {
+//            self.view.layoutIfNeeded()
+//        }
+    }
+    func textFieldDidChangeSelection(_ textField: UITextField) {
     }
     
 }

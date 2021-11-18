@@ -48,14 +48,14 @@ class LoginViewController: UIViewController {
     }()
     private lazy var emailContainerView: UIView = {
 //        guard let image = UIImage(systemName: "envelope") else {fatalError()}
-        guard let image = UIImage(named: "paper_folder") else {fatalError()}
+        guard let image = UIImage(named: "mail") else {fatalError()}
         let view = Utilities().inputContainerView(withImage: image, textField: emailTextField)
         view.layer.borderColor = UIColor.red.cgColor
         return view
     }()
     private lazy var passwordContainerView: UIView = {
 //        guard let image = UIImage(systemName: "lock") else {fatalError()}
-        guard let image = UIImage(named: "lock") else {fatalError()}
+        guard let image = UIImage(named: "lock_icon") else {fatalError()}
         let view = Utilities().inputContainerView(withImage: image, textField: passwordTextField)
         return view
     }()

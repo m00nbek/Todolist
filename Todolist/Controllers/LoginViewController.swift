@@ -187,6 +187,23 @@ class LoginViewController: UIViewController {
         showSignUpButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10).isActive = true
         showSignUpButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20).isActive = true
         
+        
+        
+        
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tap.cancelsTouchesInView = false
+        
+        view.addGestureRecognizer(tap)
+        
+    }
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
+        lockHeightAnchor?.isActive = false
+        lockHeightAnchor = self.lockImageView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.5)
+        lockHeightAnchor?.isActive = true
+        UIView.animate(withDuration: 0.5) {
+           self.view.layoutIfNeeded()
+        }
     }
 }
 // MARK: - UITextFieldDelegate

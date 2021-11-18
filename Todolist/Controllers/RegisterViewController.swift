@@ -59,8 +59,7 @@ class RegisterViewController: UIViewController {
         return view
     }()
     private lazy var fullnameContainerView: UIView = {
-//        guard let image = UIImage(systemName: "person") else {fatalError()}
-        guard let image = UIImage(named: "lock") else {fatalError()}
+        guard let image = UIImage(named: "person") else {fatalError()}
         let view = Utilities().inputContainerView(withImage: image, textField: fullnameTextField)
         return view
     }()
@@ -160,7 +159,8 @@ class RegisterViewController: UIViewController {
         
         view.addSubview(keyImageView)
         
-        keyHeightAnchor = keyImageView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.45)
+        keyHeightAnchor = keyImageView.heightAnchor.constraint(lessThanOrEqualTo: view.heightAnchor, multiplier: 0.45)
+        keyHeightAnchor?.priority = .defaultLow
         keyHeightAnchor?.isActive = true
         
         keyImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10).isActive = true
@@ -179,10 +179,25 @@ class RegisterViewController: UIViewController {
         loginTextFieldStack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -32).isActive = true
         
         view.addSubview(showSignInButton)
+        showSignInButton.topAnchor.constraint(equalTo: loginTextFieldStack.bottomAnchor, constant: 32).isActive = true
         showSignInButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10).isActive = true
         showSignInButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10).isActive = true
-        showSignInButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20).isActive = true
+        showSignInButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -32).isActive = true
         
+        
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tap.cancelsTouchesInView = false
+        
+        view.addGestureRecognizer(tap)
+    }
+    @objc func dismissKeyboard() {
+        keyHeightAnchor?.isActive = false
+        keyHeightAnchor = self.keyImageView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.45)
+        keyHeightAnchor?.isActive = true
+        UIView.animate(withDuration: 0.5) {
+            self.view.layoutIfNeeded()
+        }
+        view.endEditing(true)
     }
 }
 // MARK: - UITextFieldDelegate

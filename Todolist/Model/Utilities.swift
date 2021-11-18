@@ -21,7 +21,7 @@ class Utilities {
             let iv = UIImageView()
             iv.contentMode = .scaleAspectFit
             iv.widthAnchor.constraint(equalToConstant: 24).isActive = true
-            iv.image = image
+            iv.image = image.withAlignmentRectInsets(.init(top: 0, left: -3, bottom: 0, right: 0))
             iv.tintColor = UIColor(named: "imageViewTintColor")
             return iv
         }()
